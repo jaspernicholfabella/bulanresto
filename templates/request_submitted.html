@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block search %}
+{%endblock%}
+{%block nav%}
+<ul class="ms-auto navbar-nav"/>
+{%endblock%}
+{%block buttons%}
+
+{%endblock%}
+{% block content %}
+        <main>
+            <section class="bg-secondary hero-block pb-5 position-relative pt-5 text-white-50">
+                <div class="container pb-5 pt-5">
+                    <h1 class="display-3 fw-bold text-white">{{message}}</h1>
+                    <h1 class="display-3 fw-bold text-white">&nbsp;</h1>
+
+                    <a href="/login" class="btn btn-light pe-4 ps-4 rounded-0 rounded-pill text-dark text-uppercase">
+                        <span class="align-middle">Have an account ?   Sign IN.</span>
+                    </a>
+                </div>
+            </section>
+
+        </main>
+
+{%endblock%}

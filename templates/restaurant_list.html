@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block search %}
+{%endblock%}
+{% block content %}
+
+
+    <div class="container pb-3 pt-4" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
+        {% for restaurant in restaurant_list %}
+        <div class="align-items-center g-2 row">
+            <div class="col-lg-6 order-lg-3">
+                <div class="bg-secondary p-2 image-container">
+                    <div class="image-container_div">
+
+                    </div>
+                    <img class="img-fluid w-50 h-200" alt="..." width="100" height="100" src="{{url_for('static',filename = 'images/' + restaurant.image)}}">
+                </div>
+                    <a href={{"/restaurant/" + restaurant.slug}} class="btn btn-secondary pb-2 pe-4 ps-4 pt-2" target>Visit</a>
+            </div>
+            <div class="col-lg-6 order-lg-1 pb-3 ps-5 pe-5 pt-3">
+                <div class="pb-3 pt-3">
+                    <h3 class="fw-bold h2 text-dark"> {{restaurant.title.upper()}}</h3>
+                    <h3 class="h4 text-dark"> {{restaurant.subtitle}}</h3>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        {% endfor %}
+
+    </div>
+
+{%endblock%}

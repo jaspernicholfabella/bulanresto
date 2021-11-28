@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block search %}
+{%endblock%}
+{%block nav%}
+<ul class="ms-auto navbar-nav"/>
+{%endblock%}
+{%block buttons%}
+
+{%endblock%}
+
+
+{% block content %}
+        <main>
+            <section class="bg-secondary hero-block pb-5 position-relative pt-5 text-white-50">
+                <div class="container pb-5 pt-5">
+                    <h1 class="display-3 fw-bold text-white">Signup Now!</h1>
+                    <h1 class="display-3 fw-bold text-white">&nbsp;</h1>
+                    <form action = '/validatesignup' method="post">
+                        <div class="row">
+                            <div class="mb-3 col-md-6">User Name
+                                <span style="font-family: var(--bs-font-sans-serif); font-size: 1rem;">&nbsp;</span>
+                                <div>
+                                    <input name="username" type="text" class="input_padding bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-circle rounded-pill" id="username">
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">Email Address
+                                <span style="font-family: var(--bs-font-sans-serif); font-size: 1rem;">&nbsp;</span>
+                                <div>
+                                    <input name="email" type="email" class="input_padding bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-circle rounded-pill" id="email">
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">Home Address
+                                <span style="font-family: var(--bs-font-sans-serif); font-size: 1rem;">&nbsp;</span>
+                                <div>
+                                    <input name="homeaddress" type="text" class="input_padding bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-circle rounded-pill" id="email">
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">Password
+                                <br>
+                                <input name="password" type="password" class="input_padding bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-pill" id="password">
+                            </div>
+                            <div class="mb-3 col-md-6">Repeat Password
+                                <br>
+                                <input name="rpassword" type="password" class="input_padding bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded rounded-0 rounded-pill" id="rpassword">
+                            </div>
+
+                        </div>
+                        <div class="row">
+                        </div>
+
+                        <div class="text-end">
+                            <a href="index.html"><button type="submit" class="btn btn-dark pe-4 ps-4 rounded-0 rounded-pill text-light text-uppercase">
+                                    <span class="align-middle">Submit</span>
+                                    <svg viewBox="0 0 24 24" fill="currentColor" height="16" width="16" class="ms-1">
+                                        <path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+                                    </svg>
+                            </button></a>
+                        </div>
+                    </form>
+                    <a href="/login" class="btn btn-light pe-4 ps-4 rounded-0 rounded-pill text-dark text-uppercase">
+                        <span class="align-middle">Have an account ?   Sign IN.</span>
+                    </a>
+                </div>
+            </section>
+
+        </main>
+
+{%endblock%}

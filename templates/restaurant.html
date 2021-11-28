@@ -1,0 +1,75 @@
+
+{% extends "base.html" %}
+{% block search %}
+{% endblock %}
+
+{%block buttons %}
+
+<a class="btn btn-secondary ms-lg-3" href="/cart/{{restaurant.slug}}">Cart (<span>{{cart_data_len}}</span>)</a>
+<a class="btn btn-secondary ms-lg-3" href="/logout">Logout</a>
+{%endblock%}
+
+
+
+{% block content %}
+<section class="hero-block pb-5 position-relative pt-5 text-white-50">
+    <div class="bg-dark col-12 col-lg-7 h-100 position-absolute start-0 top-0">
+    </div>
+    <div class="container pb-5 position-relative pt-5">
+        <div class="align-items-center gy-4 row">
+            <div class="col-lg-6 pb-4">
+                <h1 class="display-3 fw-bold text-white">{{restaurant.title}}</h1>
+            </div>
+            <div class="col-lg-6">
+                <div class="bg-secondary p-lg-3">
+                    <div class="background-cover background-right-center position-relative" style="min-height: 50vh;background-image:url('{{url_for('static',filename = 'images/' + restaurant.image)}}');"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="bg-secondary pb-5 pt-5 text-white-50">
+    <div class="container">
+        <div class="align-items-center mb-4 row">
+            <div class="col-lg-7">
+                <h3 class="fw-bold h2 mb-1 text-white">Want to dine? Reserve a seat now</h3>
+                <p class="fw-light">{{restaurant.subtitle}}</p>
+            </div>
+            <div class="col-lg-auto ms-auto">
+                <a class="btn btn-light pe-4 ps-4 rounded-pill" href="#">Reserve a Seat</a>
+            </div>
+        </div>
+        <h3 class="fw-bold h2 mb-1 text-white">Our  Menu<br><br></h3>
+        <div class="g-4 justify-content-center row row-cols-lg-3 row-cols-sm-2 row-cols-xl-4">
+
+
+            {% for menu_item in menu_items %}
+            <div>
+                <div class="bg-white overflow-hidden p-2 rounded text-muted">
+                    <a href="#" class="d-block"><img src="{{url_for('static',filename = 'images/' + menu_item.image)}}" class="img-fluid w-100" alt="..." width="400" height="400"></a>
+                    <div class="p-3">
+                        <a href="#" class="link-dark text-decoration-none"><h3 class="fw-bold h5 mb-3">{{menu_item.name}}</h3></a>
+                        <div class="align-items-center gy-2 row">
+                            <div class="col-sm">
+                                <p class="h6 mb-0"><p>{{menu_item.price}}</p></p>
+                            </div>
+                            <div class="col-sm-auto">
+                                <form method ="post" action="/addtocart">
+                                  <button type="submit" name="submit_button" value="{{menu_item.id}}" class="btn btn-secondary btn-sm pe-3 ps-3 rounded-pill">Add to Cart</button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+
+
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

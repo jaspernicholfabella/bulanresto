@@ -1,0 +1,53 @@
+{% extends "base.html"%}
+
+{%block search%}
+{%endblock%}
+{%block content%}
+<h1 class="d-flex fw-bold h1 justify-content-center mb-3 text-capitalize text-dark">Cart</h1>
+<div class="container pb-5 pt-5">
+
+{% set total = {'value': 0} %}
+{% set order_list ={'value': ''} %}
+{% for cart_data in cart_data_list %}
+<h2 class="align-items-center d-flex flex-row fw-bold h4 justify-content-between mb-3 text-dark"><span>{{cart_data.name}}</span><div class="align-items-center d-flex flex-row  justify-content-between"><span class="fw h4 me-2 text-secondary">X{{cart_data.amount}}</span><span>&nbsp&nbsp&nbsp</span><span class="fw-bold h2 me-2 text-secondary">{{cart_data.price|int * cart_data.amount|int}}</span></div></h2>
+{%if total.update({"value":total.value|int + cart_data.price|int * cart_data.amount|int})%}{%endif%}
+{%if order_list.update({"value": order_list.value + cart_data.name|string + '__' + cart_data.amount|string + '::' })%}{%endif%}
+{%endfor%}
+
+    <div class="container pb-4 pt-4">
+    <div class="align-items-center row">
+        <div class="col">
+            <hr class="border-secondary mb-0 mt-0"/>
+        </div>
+        <div class="col-auto">
+            <h2 class="fw-bold h4 mb-0 text-uppercase">TOTAL</h2>
+        </div>
+        <div class="col">
+            <hr class="border-secondary mb-0 mt-0"/>
+        </div>
+    </div>
+</div>
+<h2 class="align-items-center d-flex flex-row fw-bold h4 justify-content-between mb-3 text-dark"><span>&nbsp;</span><span class="fw-bold h2 me-2 text-secondary">{{total.value}}</span></h2>
+<div class="d-grid gap-2">
+
+    <form action="/order/{{order_list.value}}" method="post">
+            <input name="slug" value={{slug}} type="hidden"/>
+            <input name="total" value={{total.value}} type="hidden"/>
+            <button id="order_button" name="order_button"  type="submit" class="btn btn-dark pe-4 ps-4 rounded-0 rounded-pill text-light text-uppercase">
+            <span class="align-middle">Order Now</span>
+            <svg viewBox="0 0 24 24" fill="currentColor" height="16" width="16" class="ms-1">
+                <path d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"></path>
+            </svg>
+            </button>
+    </form>
+</div>
+</div>
+<section class="pb-5 pt-5 text-center" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
+<div class="container pb-4 pt-4">
+    <div class="align-items-center row">
+        <div class="col-lg-7 me-auto ms-auto">
+</div>                         
+    </div>
+</div>
+</section>
+{%endblock%}

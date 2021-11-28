@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block search %}
+{% endblock %}
+{% block content %}
+
+<section class="hero-block pb-5 position-relative pt-5 text-white-50">
+    <div class="bg-secondary col-12 col-lg-7 h-100 position-absolute start-0 top-0">
+    </div>
+    <div class="container pb-5 position-relative pt-5">
+        <div class="align-items-center gy-4 row">
+            <div class="col-lg-6 pb-4">
+                <h1 class="display-3 fw-bold text-white">Life is full of Memories, we make them Sweeter</h1>
+                <a href="/restaurant_list"><button class="btn btn-lg btn-outline-light btn-secondary pb-2 pe-4 ps-4 pt-2 text-white" target type="button">View Restaurant&apos;s</button></a>
+            </div>
+            <div class="col-lg-6">
+                <div class="bg-secondary p-lg-3">
+                    <div style="min-height: 50vh;background-image:url('{{url_for('static',filename = 'images/header.jfif')}}');" class="background-center-center background-cover opacity-85"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="pb-5 pt-5 text-center" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
+    <div class="container pb-4 pt-4">
+        <div class="align-items-center row">
+            <div class="col-lg-7 me-auto ms-auto">
+                <h2 class="fw-bold h1 mb-3 text-capitalize text-dark">Discover ways to Share Your Moments with delicious meals</h2>
+            </div>
+        </div>
+    </div>
+    <div class="container pb-4 pt-4" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
+        <div class="align-items-center g-0 row">
+            <div class="col-lg-6 order-lg-2">
+                <div class="bg-secondary p-3">
+                    <img class="img-fluid w-100" alt="..." width="540" height="400" src="{{url_for('static',filename = 'images/' + random_menu[0].image)}}">
+                </div>
+            </div>
+            <div class="col-lg-6 order-lg-1 pb-3 ps-5 pe-5 pt-3">
+                <div class="pb-3 pt-3">
+                    <h3 class="fw-bold h2 text-dark">{{random_menu[0].slug.upper()}} -  {{random_menu[0].name.upper()}}</h3>
+                    <p class="fw-light">{{random_menu[0].details}}</p>
+                    <a href={{"/restaurant/" + random_menu[0].slug}} class="btn btn-secondary pb-2 pe-4 ps-4 pt-2" target>Visit</a>
+                </div>
+            </div>
+        </div>
+        <div class="align-items-center g-0 row">
+            <div class="col-lg-6">
+                <div class="bg-secondary p-3">
+                    <img src="{{url_for('static',filename = 'images/' + random_menu[1].image)}}" class="img-fluid w-100" alt="..." width="200" height="200">
+                </div>
+            </div>
+            <div class="col-lg-6 pb-3 ps-5 pe-5 pt-3">
+                <div class="pb-3 pt-3">
+                    <h3 class="fw-bold h2 text-dark">{{random_menu[1].slug.upper()}} -  {{random_menu[1].name.upper()}}</h3>
+                    <p class="fw-light">{{random_menu[1].details}}</p>
+                    <a href={{"/restaurant/" + random_menu[1].slug}} class="btn btn-secondary pb-2 pe-4 ps-4 pt-2" target>Visit</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

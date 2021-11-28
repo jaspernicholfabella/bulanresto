@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block search %}
+{% endblock %}
+{%block nav%}
+<ul class="ms-auto navbar-nav"/>
+{%endblock%}
+
+{%block buttons%}
+<a class="btn btn-secondary ms-lg-3" href="/restosignup">Restaurant Application</a>
+{%endblock%}
+{% block content %}
+        <main>
+            <section class="bg-secondary hero-block pb-5 position-relative pt-5 text-white-50">
+                <div class="container pb-5 pt-5">
+                    <h1 class="display-3 fw-bold text-white">Sign In</h1> 
+                    <form action="/validatelogin" method="post">
+                        <div class="row"> 
+                            <div class="mb-3 col-md-6"> 
+                                <label class="form-label" for="inputFirstName">Username</label>
+                                <label class="form-label" for="inputFirstName"></label>                                 
+                                <input type="text" name="username" class="bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-pill" id="inputFirstName">
+                            </div>                             
+                        </div>
+                        <div class="mb-3 col-md-6">
+                            <div>
+                                Password
+                                <input type="password" name="password" class="bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-circle rounded-pill" id="inputLastName">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-dark pe-4 ps-4 rounded-0 rounded-pill text-light text-uppercase">
+                            <span class="align-middle">LOGIN</span>
+                        </button>
+                        <div class="row"> 
+                            </div>
+                        <div class="text-end">
+                            <a href='/signup' class="btn btn-light pe-4 ps-4  text-dark text-uppercase">
+                            <span class="align-middle">SIGNUP</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+{%endblock%}

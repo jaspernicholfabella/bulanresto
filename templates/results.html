@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <div class="container pb-4 pt-4" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
+        {% for menu_item in menu_items %}
+        <div class="align-items-center g-0 row">
+            <div class="col-lg-6 order-lg-2">
+                <div class="bg-secondary p-3">
+                    <img class="img-fluid w-100" alt="..." width="540" height="400" src="{{url_for('static',filename = 'images/' + menu_item.image)}}">
+                </div>
+            </div>
+            <div class="col-lg-6 order-lg-1 pb-3 ps-5 pe-5 pt-3">
+                <div class="pb-3 pt-3">
+                    <h3 class="fw-bold h2 text-dark">{{menu_item.slug.upper()}} -  {{menu_item.name.upper()}}</h3>
+                    <a href={{"/restaurant/" + menu_item.slug}} class="btn btn-secondary pb-2 pe-4 ps-4 pt-2" target>Visit</a>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        {% endfor %}
+
+    </div>
+
+{%endblock%}
