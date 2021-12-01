@@ -54,6 +54,14 @@ def db_drop():
 def home():
     return redirect(url_for("login"))
 
+@app.route('/reservation')
+def reservation():
+    if current_user.is_authenticated:
+        if current_user.access == 'user':
+            return render_template('reservation.html')
+    else:
+        return config_data["access_deny_message"]
+
 @app.route('/homepage')
 def homepage():
     if current_user.is_authenticated:
