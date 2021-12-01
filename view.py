@@ -20,7 +20,7 @@ class UserModelView(ModelView):
     }
 
     def is_accessible(self):
-        if current_user.is_authenticated :
+        if current_user.is_authenticated:
             if current_user.access == 'admin':
                 return True
 

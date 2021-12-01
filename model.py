@@ -18,7 +18,6 @@ class User(db.Model, UserMixin):
     homeaddress  = Column(String)
     access = Column(String)
 
-
 class RestaurantSignup(db.Model):
     __tablename__ = 'restaurantsignup'
     id = Column(Integer, primary_key=True)
@@ -39,7 +38,6 @@ class Restaurants(db.Model):
     slug = Column(String(255))
     useraccount = Column(String(255))
 
-
 class MenuItems(db.Model):
     __tablename__ = 'menu_items'
     id = Column(Integer,primary_key=True)
@@ -49,7 +47,6 @@ class MenuItems(db.Model):
     price = Column(String(255))
     search_tags = Column(String(255))
     slug = Column(String(255))
-
 
 class Delivery(db.Model):
     __tablename__ = 'delivery'

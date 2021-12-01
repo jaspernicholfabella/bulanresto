@@ -155,7 +155,6 @@ def validate_resto_signup():
             db.session.add(new_restaurant_request)
             db.session.commit()
             return render_template("request_submitted.html",message=f"Request Submitted! {data_count}")
-
     except Exception as e:
         return render_template("request_submitted.html",message=f"Request Failed! : {e}")
 
