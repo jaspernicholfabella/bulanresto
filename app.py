@@ -226,7 +226,7 @@ def restaurant_list():
     restaurant_list = Restaurants.query.order_by(asc(Restaurants.title))
     filtered_restaurant_list = []
     for restaurant in restaurant_list:
-        
+
         filtered_restaurant_list.append(restaurant)
     return render_template('restaurant_list.html', restaurant_list=filtered_restaurant_list,is_login=is_login)
 
@@ -288,7 +288,6 @@ def addtocart():
                 comments={}
             return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items, comments=comments,
                                    is_login=is_login, cart_data_len=len(cart_data), form=form)
-
 
 
     except Exception as e:
