@@ -1,7 +1,106 @@
-{% extends "base.html" %}
+{%extends "base.html"%}
+{%block navbutton%}
+{% if not is_login%}
+<div class="navbar-buttons mbr-section-btn">
+    <a class="btn btn-primary-outline display-4" href="/restosignup">
+    Restaurant Signup
+    </a>
+    <a class="btn btn-primary display-4" href="/login">
+    <span class="mbrib-login mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Login</a>
+</div>
+{%else%}
+<div class="navbar-buttons mbr-section-btn">
+    <a class="btn btn-primary-outline display-4" href="/cart">
+    <span class="mbrib-shopping-cart mbr-iconfont mbr-iconfont-btn" style="color: rgb(142, 43, 37);"></span>Cart (0)</a>
+    <a class="btn btn-primary display-4" href="/logout">
+    <span class="mbrib-logout mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Logout</a>
+</div>
+{%endif%}
+{%endblock%}
 
-{% block content %}
+{%block content%}
 
-<section class="pb-5 pt-5 text-center" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
+<section data-bs-version="5.1" class="form1 cid-sRx9TADYl6 mbr-parallax-background" id="form1-1f">
+    <div class="mbr-overlay" style="opacity: 0.6; background-color: rgb(0, 0, 0);"></div>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 mx-auto mbr-form" data-form-type="formoid">
+                <form action="" method="post" class="mbr-form form-with-styler">
+                    {{form.hidden_tag()}}
+                    <div class="dragArea row">
+                        <div class="col-12">
+                            <h1 class="mbr-section-title mb-4 mbr-fonts-style align-center display-2">
+                                <strong>Feeling Hungry?</strong></h1>
+                        </div>
+                        <div class="col-12">
+                            
+                        </div>
+                        <div class="col-md col-12 form-group mb-3" data-for="name">
+                            {{form.search_string(class="form-control",size=32)}}
+                        </div>
+                        
+                        <div class="mbr-section-btn col-12 col-md-auto"><button type="submit" class="btn btn-white-outline display-4"><span class="mobi-mbri mobi-mbri-search mbr-iconfont mbr-iconfont-btn"></span>Search</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </section>
-{% endblock %}
+
+{%if is_result_empty%}
+<section data-bs-version="5.1" class="content6 cid-sRy13QcBYF" id="content6-20">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+                <hr class="line">
+                <p class="mbr-text align-center mbr-fonts-style my-4 display-5">
+                    <em>Empty Results . . .</em></p>
+                <hr class="line">
+            </div>
+        </div>
+    </div>
+</section>
+{%else%}
+
+<section data-bs-version="5.1" class="features8 cid-sRx9LEtGuF mbr-parallax-background" xmlns="http://www.w3.org/1999/html" id="features9-1d">
+    <div class="mbr-overlay" style="opacity: 0.6; background-color: rgb(0, 0, 0);">
+    </div>
+    <div class="container-fluid">
+        {% for menu_item in menu_items %}
+        <div class="card">
+            <div class="card-wrapper">
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-3">
+                        <div class="image-wrapper row justify-content-center" style="background:url({{'../static/images/'+menu_item.image}}); background-size:cover; background-position: center;padding-top:1rem; padding-bottom:1rem; padding-left:1rem; padding-right:1rem;">
+                            <div style="width:15rem !important; height:15rem !important;"></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md">
+                        <div class="card-box">
+                            <div class="row">
+                                <div class="col-md">
+                                    <h6 class="card-title mbr-fonts-style display-5">
+                                        <strong>{{menu_item.name.upper()}}</strong></h6>
+                                    <p class="mbr-text mbr-fonts-style display-7">
+                                        Restaurant : {{menu_item.slug.upper()}}
+                                    </p>
+                                </div>
+                                <div class="col-md-auto">
+                                    <p class="price mbr-fonts-style display-5"></p>
+                                    <div class="mbr-section-btn"><a href={{"/restaurant/" + menu_item.slug}} class="btn btn-white-outline display-4"><span class="mbrib-right mbr-iconfont mbr-iconfont-btn"></span>Visit&nbsp;</a></div>
+                                </div>
+                                <div class="col-lg-2 d-none d-lg-block"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</section>
+
+
+{%endif%}
+{%endblock%}

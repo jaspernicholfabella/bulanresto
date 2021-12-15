@@ -7,10 +7,12 @@ from flask_login import UserMixin, LoginManager, current_user, login_user, logou
 from flask_admin.menu import MenuLink
 from PIL import Image
 from config import setup_app, config_data
-from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery
+from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback
 from view import RestaurantsModelView,MenuItemsModelView,UserModelView,RestaurantSignupModelView,DeliveryModelView,DeliveryModelView2
 import random
 import datetime
+from forms import SignupForm,LoginForm,RestaurantSignupForm,SearchForm,FeedbackForm
+
 
 app = setup_app()
 app.config['UPLOAD_FOLDER'] = config_data["upload_folder"]
@@ -31,6 +33,19 @@ admin.add_view(DeliveryModelView(Delivery, db.session, name="Delivery Request"))
 admin.add_view(DeliveryModelView2(Delivery, db.session, name="Delivery Record", endpoint='record'))
 admin.add_link(MenuLink(name='Logout', category='', url="/logout"))
 
+@app.context_processor
+def default_contents():
+    home_title = 'Life is full of Memories, we make them sweeter'
+    home_subtitle = 'Choose a Restaurant'
+    home_card_title = ["Restaurant Reservations","Order Food Now!","Join our Community"]
+    home_card_subtitle =["Reserve a seat on our affiliated restaurants.","Easy ordering with free shipping fee.","We listen to feedback, be a part of our community."]
+    restaurant_list_title = 'Our Affiliated Restaurant\'s'
+    return dict(home_title=home_title,
+                home_subtitle= home_subtitle,
+                home_card_title = home_card_title,
+                home_card_subtitle=home_card_subtitle,
+                restaurant_list_title=restaurant_list_title
+                )
 
 @login.user_loader
 def load_user(user_id):
@@ -52,7 +67,22 @@ def db_drop():
 ## ROUTES
 @app.route('/')
 def home():
-    return redirect(url_for("login"))
+    is_login = False
+    if current_user.is_authenticated:
+        if current_user.access == 'user':
+            is_login = True
+
+
+    restaurant = Restaurants.query.all()
+    random_number_1 = random.randrange(0, len(restaurant))
+    random_number_2 = random.randrange(0, len(restaurant))
+    random_resto_1 = restaurant[random_number_1]
+    random_resto_2 = restaurant[random_number_2]
+    menu_item_1 = MenuItems.query.filter_by(slug=random_resto_1.slug).all()
+    menu_item_2 = MenuItems.query.filter_by(slug=random_resto_2.slug).all()
+
+
+    return render_template('index.html',random_resto=[random_resto_1,random_resto_2],menu_item =[menu_item_1,menu_item_2],is_login=is_login)
 
 @app.route('/reservation')
 def reservation():
@@ -62,135 +92,187 @@ def reservation():
     else:
         return config_data["access_deny_message"]
 
-@app.route('/homepage')
-def homepage():
+@app.route('/signup',methods=["POST","GET"])
+def signup():
+    is_error=True
+    error=''
+    is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            menu_items = MenuItems.query.all()
-            random_menu_1 = menu_items[random.randrange(0,len(menu_items))]
-            random_menu_2 = menu_items[random.randrange(0,len(menu_items))]
-            return render_template('index.html', random_menu=[random_menu_1, random_menu_2])
-    else:
-        return config_data["access_deny_message"]
+            is_login = True
+    form = SignupForm()
+    if form.validate_on_submit():
+        try:
+            if User.query.filter_by(username=form.user_name.data).count() > 0:
+                return render_template("messages.html",no_buttons=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Username {form.user_name.data} is already on the database.",is_error=is_error)
+            elif User.query.filter_by(emailaddress=form.email_address.data).count() > 0:
+                return render_template("messages.html",no_buttons=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Email Address {form.email_address.data} is already on the database.",is_error=is_error)
+            else:
+                add_signup = User(
+                    username=form.user_name.data,
+                    password=form.password.data,
+                    emailaddress=form.email_address.data,
+                    homeaddress=form.home_address.data,
+                    access='user'
+                )
+                db.session.add(add_signup)
+                db.session.commit()
+                is_error=False
+                return render_template("messages.html",no_button=False,  message_title=f"REQUEST ACCEPTED.", message_subtitle="Your Account is created Successfuly.",is_error=is_error)
 
-@app.route('/restosignup')
-def restosignup():
-    error = False
-    return render_template("restosignup.html",error=error)
+        except Exception as e:
+            error = f'Something Went Wrong! {e}'
+            return render_template("messages.html",no_button=False,  message_title=f"SOMETHING WENT WRONG!", message_subtitle=f"{e}",is_error=is_error)
 
-@app.route('/signup')
-def signup():
-    error = False
-    return render_template("signup.html",error=error)
+    return render_template("signup.html",form=form,error=error)
 
-@app.route('/login')
-def login(error=False):
-    return render_template("login.html",error=error)
+@app.route('/login',methods=["POST","GET"])
+def login():
+    error=''
+    is_login = False
+    if current_user.is_authenticated:
+        if current_user.access == 'user':
+            is_login = True
+    form=LoginForm()
+    if form.validate_on_submit():
+        try:
+            user = User.query.filter_by(username=form.user_name.data).one()
+            if form.user_name.data == user.username and form.password.data == user.password:
+                login_user(user)
+                user_details = {}
+                user_details.update({'id': user.id})
+                user_details.update({'name': user.name})
+                user_details.update({'access': user.access})
+                if user.access == 'user':
+                    return redirect(url_for("home"),)
+                elif user.access == 'restaurant':
+                    return redirect(url_for("admin.index"))
+                elif user.access == 'admin':
+                    return redirect(url_for("admin.index"))
+            else:
+                error = 'Username or Password is Incorrect'
+                return render_template("login.html", form=form, error=error)
+        except Exception as e:
+            error = 'Username or Password is Incorrect'
+            return render_template("login.html", form=form, error=error)
+
+    return render_template("login.html", form=form, error=error)
 
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/validatelogin',methods=["POST","GET"])
-def validatelogin():
-    if request.method == "POST":
-        username=request.form["username"]
-        password=request.form["password"]
-        user = User.query.filter_by(username=username).one()
-        if ((username == user.username) and (password == user.password)):
-            login_user(user)
-            user_details = {}
-            user_details.update({'id':user.id})
-            user_details.update({'name': user.name})
-            user_details.update({'access': user.access})
-            if user.access == 'user':
-                return redirect(url_for("homepage"))
-            elif user.access == 'restaurant':
-                return redirect(url_for("admin.index"))
-            elif user.access == 'admin':
-                return redirect(url_for("admin.index"))
-    return f'{username},{password}'
-
-@app.route('/validatesignup', methods=["POST","GET"])
-def validatesignup():
-    if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        homeaddress = request.form['homeaddress']
-        password = request.form['password']
-        rpassword = request.form['rpassword']
-
-        if User.query.filter_by(username=username).count() > 0:
-            return render_template("request_submitted.html", message=f"username:{username} already in use.")
-        elif User.query.filter_by(emailaddress=email).count() > 0:
-            return render_template("request_submitted.html", message=f"email:{email} already in use.")
-        elif password != rpassword:
-            return render_template("request_submitted.html", message=f"Password does not match")
-        else:
-            add_signup = User(
-                username=username,
-                password=password,
-                emailaddress=email,
-                homeaddress = homeaddress,
-                access='user'
-            )
-            db.session.add(add_signup)
-            db.session.commit()
-            return render_template("request_submitted.html", message=f"Signed Up Successfully")
-
-    return 'error'
-
-@app.route('/validaterestosignup',methods=["POST","GET"])
-def validate_resto_signup():
+@app.route('/restosignup',methods=["POST","GET"])
+def restosignup():
+    form = RestaurantSignupForm()
+    data_count = 0
     try:
-        data_count = 0
         data_count = RestaurantSignup.query.count()
-
-        if request.method == "POST":
-            file = request.files["file"]
-            print(f'filename: {file.filename}')
-            final_file_name = f'{data_count}_{file.filename}'
-            file.save(f"{config_data['upload_folder']}\\{final_file_name}")
+    except:
+        pass
+    if form.validate_on_submit():
+        is_error = True
+        try:
+            final_file_name = f'{data_count}_{form.file_field.data.filename}'
+            form.file_field.data.save(f"{config_data['upload_folder']}\\{final_file_name}")
             new_restaurant_request = RestaurantSignup(
-                name=request.form["name"],
-                owner=request.form["owner"],
-                address=request.form["address"],
-                email=request.form["email"],
+                name=form.restaurant_name.data,
+                owner=form.owner_name.data,
+                address=form.address.data,
+                email=form.email_address.data,
                 attached_files=final_file_name,
                 date=datetime.datetime.now()
             )
             db.session.add(new_restaurant_request)
             db.session.commit()
-            return render_template("request_submitted.html",message=f"Request Submitted! {data_count}")
-    except Exception as e:
-        return render_template("request_submitted.html",message=f"Request Failed! : {e}")
+            is_error=False
+            return render_template("messages.html",no_button=False, message_title=f"REQUEST ACCEPTED.", message_subtitle="Your Message has been submitted. Wait for email from the admin for your username and password if your request is accepted.",is_error=is_error)
+        except Exception as e:
+            return render_template("messages.html",no_button=False, message_title=f"ERROR IN REQUEST!", message_subtitle="An Unknown Error Has Occured",is_error=is_error)
+
+    return render_template("restosignup.html", form=form)
+
+@app.route('/search',methods=["POST","GET"])
+def searchpage():
+    form = SearchForm()
+    is_login = False
+    if current_user.is_authenticated:
+        if current_user.access == 'user':
+            is_login = True
+    is_result_empty = True
+    menu_items = []
+    if form.validate_on_submit():
+        menu_items = MenuItems.query.order_by(asc(MenuItems.name))
+        filtered_menu_items = []
+        for menu in menu_items:
+            if str(form.search_string.data).lower() in menu.search_tags:
+                filtered_menu_items.append(menu)
+        is_result_empty=False
+        if len(filtered_menu_items) == 0:
+            is_result_empty=True
+        return render_template("search.html", form=form, menu_items=filtered_menu_items, is_result_empty=is_result_empty,is_login=is_login)
+    else:
+        return render_template("search.html",form=form,menu_items=menu_items,is_result_empty=is_result_empty,is_login=is_login)
+
+    return render_template("search.html",form=form,menu_items=menu_items,is_result_empty=is_result_empty,is_login=is_login)
 
 @app.route('/restaurant_list')
 def restaurant_list():
+    is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            restaurant_list = Restaurants.query.order_by(asc(Restaurants.title))
-            filtered_restaurant_list = []
-            for restaurant in restaurant_list:
-                filtered_restaurant_list.append(restaurant)
-            return render_template('restaurant_list.html', restaurant_list=filtered_restaurant_list)
-    else:
-        return config_data["access_deny_message"]
+            is_login = True
+    restaurant_list = Restaurants.query.order_by(asc(Restaurants.title))
+    filtered_restaurant_list = []
+    for restaurant in restaurant_list:
+        
+        filtered_restaurant_list.append(restaurant)
+    return render_template('restaurant_list.html', restaurant_list=filtered_restaurant_list,is_login=is_login)
 
-@app.route('/restaurant/<string:slug>')
+@app.route('/restaurant/<string:slug>',methods=['GET','POST'])
 def restaurantpage(slug):
+    form = FeedbackForm()
+    is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            cart_data.clear()
-            restaurant = Restaurants.query.filter_by(slug=slug).one()
-            menu_items = MenuItems.query.filter_by(slug=slug).order_by(asc(MenuItems.name))
-            return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items,cart_data_len=0)
-    else:
-        return config_data["access_deny_message"]
+            is_login = True
+            if form.validate_on_submit():
+                feedback_query = Feedback(
+                    username=current_user.name,
+                    slug=slug,
+                    rate=float(form.rate.data),
+                    comment=form.message.data
+                )
+                db.session.add(feedback_query)
+                db.session.commit()
+                return render_template("messages.html",no_button=True,message_title=f"COMMENT SUBMITTED!",
+                                       message_subtitle="Your comment has been submitted", is_error=False)
+
+    cart_data.clear()
+
+    restaurant = Restaurants.query.filter_by(slug=slug).one()
+    menu_items = MenuItems.query.filter_by(slug=slug).order_by(asc(MenuItems.name))
+    comments = Feedback.query.filter_by(slug=slug).order_by(asc(Feedback.username))
+    return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items,comments=comments,is_login=is_login,cart_data_len=0,form=form)
+
+@app.route('/login_error')
+def login_error():
+    return render_template("messages.html",no_button=False, message_title=f"CANNOT ADD TO CART!",
+                           message_subtitle="You should login first to use this function", is_error=True)
+
+@app.route('/login_error_2')
+def login_error_2():
+    return render_template("messages.html",no_button=False, message_title=f"CANNOT COMMENT OR RATE!",
+                           message_subtitle="You should login first to use this function", is_error=True)
 
 @app.route('/addtocart',methods=["POST","GET"])
 def addtocart():
+    form = FeedbackForm()
+    is_login = False
+    if current_user.is_authenticated:
+        if current_user.access == 'user':
+            is_login = True
     try:
         if request.method == "POST":
             id = int(request.form["submit_button"])
@@ -200,10 +282,21 @@ def addtocart():
             print(f'cart_data: {cart_data}')
             restaurant = Restaurants.query.filter_by(slug=slug).one()
             menu_items = MenuItems.query.filter_by(slug=slug).order_by(asc(MenuItems.name))
-            return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items,cart_data_len=len(cart_data))
+            try:
+                comments = Feedback.query.filter_by(slug=slug).order_by(asc(Feedback.username))
+            except:
+                comments={}
+            return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items, comments=comments,
+                                   is_login=is_login, cart_data_len=len(cart_data), form=form)
+
+
 
     except Exception as e:
-        return f'Error: {e}'
+        return render_template("messages.html",no_button=True, message_title=f"SOMETHING WENT WRONG!",
+                           message_subtitle=f"{e}", is_error=True, no_buttons=False)
+
+    return render_template("messages.html",no_button=True, message_title=f"SOMETHING WENT WRONG!",
+                           message_subtitle=f"common errors: Refreshing page while adding item to cart can cause this.", is_error=True)
 
 @app.route('/cart/<string:slug>')
 def cart(slug):
@@ -217,6 +310,13 @@ def cart(slug):
             'price' : int(str(menu_items.price).replace('PHP','').strip())
         })
     return render_template("cart.html",cart_data_list=cart_data_list,slug=slug)
+
+@app.route('/cart')
+def empty_cart():
+    return render_template("messages.html",no_button=True, message_title=f"CART EMPTY!",
+                           message_subtitle=f"Please select a restaurant first and order.", is_error=True)
+
+
 
 @app.route('/order/<string:order_data>',methods=["POST","GET"])
 def order(order_data):
@@ -238,38 +338,17 @@ def order(order_data):
             db.session.add(new_order)
             db.session.commit()
             cart_data = []
-            return render_template("message_feedback.html", message=f"The order has been submitted, wait for it to be delivered Enjoy! :)")
+            return render_template("messages.html", no_button=True, message_title=f"ORDER SUCCESS!",
+                                   message_subtitle=f"The order has been submitted, wait for it to be delivered Enjoy! :)", is_error=False)
     except Exception as e:
-        return render_template("message_feedback.html", message=f"Error {e}")
+        return render_template("messages.html", no_button=True, message_title=f"ORDER FAILED!",
+                               message_subtitle=f"Something went wrong with your request please try again! :)",
+                               is_error=False)
 
-@app.route('/search',methods=["POST","GET"])
-def searchpage():
-    if current_user.is_authenticated:
-        if current_user.access == 'user':
-            if request.method == "POST":
-                search = request.form["search_input"]
-                return redirect(url_for("searchresults", search=search))
-            else:
-                return render_template("search.html")
-    else:
-        return config_data["access_deny_message"]
 
-@app.route('/results/<search>')
-def searchresults(search):
-    if current_user.is_authenticated:
-        if current_user.access == 'user':
-            menu_items = MenuItems.query.order_by(asc(MenuItems.name))
-            filtered_menu_items = []
-            for menu in menu_items:
-                if search.lower() in menu.search_tags:
-                    filtered_menu_items.append(menu)
-
-            return render_template('results.html', menu_items=filtered_menu_items)
-    else:
-        return config_data["access_deny_message"]
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,use_debugger=True,use_reloader=True)
 
 

@@ -1,32 +1,75 @@
-{% extends "base.html" %}
-{% block search %}
+{%extends "base.html"%}
+
+
+{%block navbutton%}
+{% if not is_login%}
+<div class="navbar-buttons mbr-section-btn">
+    <a class="btn btn-primary-outline display-4" href="/restosignup">
+    Restaurant Signup
+    </a>
+    <a class="btn btn-primary display-4" href="/login">
+    <span class="mbrib-login mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Login</a>
+</div>
+{%else%}
+<div class="navbar-buttons mbr-section-btn">
+    <a class="btn btn-primary-outline display-4" href="/cart">
+    <span class="mbrib-shopping-cart mbr-iconfont mbr-iconfont-btn" style="color: rgb(142, 43, 37);"></span>Cart (0)</a>
+    <a class="btn btn-primary display-4" href="/logout">
+    <span class="mbrib-logout mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Logout</a>
+</div>
+{%endif%}
 {%endblock%}
-{% block content %}
 
-
-    <div class="container pb-3 pt-4" src="https://scontent.fmnl2-1.fna.fbcdn.net/v/t1.6435-9/240710762_1983023981866916_500105142480159149_n.jpg?_nc_cat=111&ccb=1-5&_nc_sid=8bfeb9&_nc_eui2=AeEC6a7N56sHzGsqG5t-wX_gZMd4JRMe-aNkx3glEx75o28TsqeGL8T9I7-QcPugduhdJSe9tRii7ZOfGAKEtXxG&_nc_ohc=81hhXUxCmD4AX__o0up&_nc_ht=scontent.fmnl2-1.fna&oh=af0c0f9fc2ac840746ca63e07900cb62&oe=615FF7FB">
-        {% for restaurant in restaurant_list %}
-        <div class="align-items-center g-2 row">
-            <div class="col-lg-6 order-lg-3">
-                <div class="bg-secondary p-2 image-container">
-                    <div class="image-container_div">
-
-                    </div>
-                    <img class="img-fluid w-50 h-200" alt="..." width="100" height="100" src="{{url_for('static',filename = 'images/' + restaurant.image)}}">
-                </div>
-                    <a href={{"/restaurant/" + restaurant.slug}} class="btn btn-secondary pb-2 pe-4 ps-4 pt-2" target>Visit</a>
+{%block content%}
+<section data-bs-version="5.1" class="content4 cid-sRzTr0ekBr" id="content4-2i">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="title col-md-12 col-lg-10">
+                <h3 class="mbr-section-title mbr-fonts-style align-center mb-4 display-2"><strong>{{restaurant_list_title}}</strong></h3>
             </div>
-            <div class="col-lg-6 order-lg-1 pb-3 ps-5 pe-5 pt-3">
-                <div class="pb-3 pt-3">
-                    <h3 class="fw-bold h2 text-dark"> {{restaurant.title.upper()}}</h3>
-                    <h3 class="h4 text-dark"> {{restaurant.subtitle}}</h3>
+        </div>
+    </div>
+</section>
+
+
+<section data-bs-version="5.1" class="features8 cid-sRzTldoIDj mbr-parallax-background" xmlns="http://www.w3.org/1999/html" id="features9-2h">
+    <div class="mbr-overlay" style="opacity: 0.6; background-color: rgb(0, 0, 0);">
+    </div>
+    <div class="container-fluid">
+
+        {% for restaurant in restaurant_list %}
+        <div class="card">
+            <div class="card-wrapper">
+                <div class="row align-items-center">
+                    <div class="col-12 col-md-3">
+                        <div class="image-wrapper row justify-content-center" style="background:url({{'../static/images/'+restaurant.image}}); background-size:cover; background-position: center;padding-top:1rem; padding-bottom:1rem; padding-left:1rem; padding-right:1rem;">
+<!--                            <img style="width:15rem !important; height:15rem !important;" src="{{url_for('static',filename = 'images/' + restaurant.image)}}" alt="restaurant.slug">-->
+                            <div style="width:12rem !important; height:12rem !important;"></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md">
+                        <div class="card-box">
+                            <div class="row">
+                                <div class="col-md">
+                                    <h6 class="card-title mbr-fonts-style display-5">
+                                        <strong>{{restaurant.title.upper()}}</strong></h6>
+                                    <p class="mbr-text mbr-fonts-style display-7">
+                                        {{restaurant.subtitle}}
+                                    </p>
+                                </div>
+                                <div class="col-md-auto">
+                                    <p class="price mbr-fonts-style display-5">4.2 ★</p>
+                                    <div class="mbr-section-btn"><a href={{"/restaurant/" + restaurant.slug}} class="btn btn-white-outline display-4"><span class="mbrib-right mbr-iconfont mbr-iconfont-btn"></span>Visit&nbsp;</a></div>
+                                </div>
+                                <div class="col-lg-2 d-none d-lg-block"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        <br>
-        <br>
-        {% endfor %}
+        {%endfor%}
 
     </div>
-
+</section>
 {%endblock%}

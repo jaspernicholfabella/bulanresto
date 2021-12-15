@@ -1,44 +1,93 @@
-{% extends "base.html" %}
-{% block search %}
-{% endblock %}
-{%block nav%}
-<ul class="ms-auto navbar-nav"/>
+{%extends "base.html"%}
+{%block navbutton%}
+{% if not is_login%}
+<div class="navbar-buttons mbr-section-btn">
+    <a class="btn btn-primary-outline display-4" href="/restosignup">
+    Restaurant Signup
+    </a>
+    <a class="btn btn-primary display-4" href="/login">
+    <span class="mbrib-login mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Login</a>
+</div>
+{%else%}
+<div class="navbar-buttons mbr-section-btn">
+    <a class="btn btn-primary-outline display-4" href="/cart">
+    <span class="mbrib-shopping-cart mbr-iconfont mbr-iconfont-btn" style="color: rgb(142, 43, 37);"></span>Cart (0)</a>
+    <a class="btn btn-primary display-4" href="/logout">
+    <span class="mbrib-logout mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Logout</a>
+</div>
+{%endif%}
+
 {%endblock%}
 
-{%block buttons%}
-<a class="btn btn-secondary ms-lg-3" href="/restosignup">Restaurant Application</a>
-{%endblock%}
-{% block content %}
-        <main>
-            <section class="bg-secondary hero-block pb-5 position-relative pt-5 text-white-50">
-                <div class="container pb-5 pt-5">
-                    <h1 class="display-3 fw-bold text-white">Sign In</h1> 
-                    <form action="/validatelogin" method="post">
-                        <div class="row"> 
-                            <div class="mb-3 col-md-6"> 
-                                <label class="form-label" for="inputFirstName">Username</label>
-                                <label class="form-label" for="inputFirstName"></label>                                 
-                                <input type="text" name="username" class="bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-pill" id="inputFirstName">
-                            </div>                             
+{%block content%}
+
+<section data-bs-version="5.1" class="form6 cid-sRvkSCVPxp" id="form6-g">
+    
+    <div class="mbr-overlay"></div>
+    <div class="container">
+        <div class="mbr-section-head">
+            <h3 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                <strong>Sign in to your Account</strong></h3>
+            
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-8 mx-auto mbr-form" data-form-type="formoid">
+
+
+                <form action="" method="post" class="mbr-form form-with-styler mx-auto">
+                    {{form.hidden_tag()}}
+                    <div class="dragArea row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 form-group mb-3">
+                            {{form.user_name(class="form-control",size=32)}}
+                            {% if form.user_name.errors %}
+                            <ul class="errors text-white">
+                                {% for error in form.user_name.errors %}
+                                <li>{{error}}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
                         </div>
-                        <div class="mb-3 col-md-6">
-                            <div>
-                                Password
-                                <input type="password" name="password" class="bg-light border-end-0 border-start-0 border-top-0 form-control pe-0 ps-3 rounded-0 rounded-circle rounded-pill" id="inputLastName">
-                            </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 form-group mb-3" >
+                            {{form.password(class="form-control",size=32)}}
+                            {% if form.password.errors %}
+                                <ul class="errors text-white">
+                                {% for error in form.password.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
                         </div>
-                        <button type="submit" class="btn btn-dark pe-4 ps-4 rounded-0 rounded-pill text-light text-uppercase">
-                            <span class="align-middle">LOGIN</span>
-                        </button>
-                        <div class="row"> 
-                            </div>
-                        <div class="text-end">
-                            <a href='/signup' class="btn btn-light pe-4 ps-4  text-dark text-uppercase">
-                            <span class="align-middle">SIGNUP</span>
-                            </a>
+
+                        <div class="col-auto mbr-section-btn align-center">
+                            <button type="submit" class="btn btn-primary display-4">
+                                <span class="mobi-mbri mobi-mbri-paper-plane mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);">
+                                </span>LOGIN
+                            </button>
                         </div>
-                    </form>
-                </div>
-            </section>
-        </main>
+                        <center>
+                            <br>
+                        <p class="text-white">{{error}}</p>
+                        </center>
+
+                    </div>
+                </form>
+
+
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="content11 cid-sRx8HLUnLn" id="content11-1a">
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-12">
+                <div class="mbr-section-btn align-center"><a class="btn btn-white-outline display-4" href="/signup"><span class="mobi-mbri mobi-mbri-contact-form mbr-iconfont mbr-iconfont-btn" style="color: rgb(255, 255, 255);"></span>Don't Have an Account?  Signup</a></div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {%endblock%}

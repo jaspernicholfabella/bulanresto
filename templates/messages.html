@@ -1,0 +1,76 @@
+{%extends "base.html"%}
+{%block navlist%}
+{%endblock%}
+{%block navbutton%}
+{%endblock%}
+{%block content%}
+
+{%if not is_error%}
+<section data-bs-version="5.1" class="content7 cid-sRyszCSrWT" id="content7-2a" style="margin-top:3rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10">
+                <blockquote>
+                <h5 class="mbr-section-title mbr-fonts-style mb-2 display-7"><strong>{{message_title}}</strong></h5>
+                <p class="mbr-text mbr-fonts-style display-4">{{message_subtitle}}</p></blockquote>
+            </div>
+        </div>
+    </div>
+</section>
+{%else%}
+<section data-bs-version="5.1" class="content7 cid-sRARyVUSAJ" id="content7-2j" style="margin-top:3rem;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10">
+                <blockquote>
+                <h5 class="mbr-section-title mbr-fonts-style mb-2 display-7"><strong>{{message_title}}</strong></h5>
+                <p class="mbr-text mbr-fonts-style display-4">{{message_subtitle}}</p></blockquote>
+            </div>
+        </div>
+    </div>
+</section>
+{%endif%}
+{%if not no_button%}
+<section data-bs-version="5.1" class="content4 cid-sRysTfrY1u" id="content4-2c">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="title col-md-12 col-lg-10">
+                <h4 class="mbr-section-subtitle align-center mbr-fonts-style mb-4 display-5">Don't Have an Account?</h4>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="content11 cid-sRysA9ZI8O" id="content11-2b">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+                <div class="mbr-section-btn align-center"><a class="btn btn-primary display-4" href="/login">Login</a>
+                    <a class="btn btn-white-outline display-4" href="/signup">Signup</a></div>
+            </div>
+        </div>
+    </div>
+</section>
+{%else%}
+<section data-bs-version="5.1" class="content4 cid-sRysTfrY1u">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="title col-md-12 col-lg-10">
+                <h4 class="mbr-section-subtitle align-center mbr-fonts-style mb-4 display-5">Go Back to the Home Screen.</h4>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="content11 cid-sRysA9ZI8O">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12 col-lg-10">
+                <div class="mbr-section-btn align-center"><a class="btn btn-white-outline display-4" href="/">Home</a></div>
+            </div>
+        </div>
+    </div>
+</section>
+{%endif%}
+
+{%endblock%}
