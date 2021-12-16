@@ -120,7 +120,7 @@ def home():
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            empty_cart_data()
+            emtpy_cart_data()
             is_login = True
 
 
@@ -254,7 +254,7 @@ def searchpage():
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            empty_cart_data()
+            emtpy_cart_data()
             is_login = True
     is_result_empty = True
     menu_items = []
@@ -275,11 +275,11 @@ def searchpage():
 
 @app.route('/restaurant_list')
 def restaurant_list():
-    empty_cart_data()
+    emtpy_cart_data()
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            empty_cart_data()
+            emtpy_cart_data()
             is_login = True
 
     restaurant_list = Restaurants.query.order_by(asc(Restaurants.title))
