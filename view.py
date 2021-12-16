@@ -1,5 +1,6 @@
 from flask import redirect,url_for
 from flask_admin.contrib.sqla import ModelView
+from flask_admin import AdminIndexView,expose
 from flask_login import current_user
 from flask_admin import form
 from config import config_data
@@ -40,7 +41,6 @@ class RestaurantsModelView(ModelView):
     def on_model_change(self, form, model, is_created):
         if is_created and not model.slug:
             model.slug = str(model.useraccount)
-
 
     def _list_thumbnail(view, context, model, name):
         print(f'name: {name}')
@@ -128,6 +128,7 @@ class DeliveryModelView(ModelView):
     page_size = 50
     create_modal = True
     edit_modal = True
+    column_exclude_list = ['slug', ]
     form_excluded_columns=['userid','slug','cartitems''date','total']
 
     def get_query(self):
@@ -149,6 +150,7 @@ class DeliveryModelView2(ModelView):
     page_size = 50
     create_modal = True
     edit_modal = True
+    column_exclude_list = ['slug', ]
     form_excluded_columns=['userid','slug','cartitems''date','total','delivered']
 
 

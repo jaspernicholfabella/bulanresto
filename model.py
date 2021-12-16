@@ -67,12 +67,11 @@ class Feedback(db.Model):
     rate = Column(Float)
     comment = Column(String)
 
-class ReservationSlot(db.Model):
-    __tablename__ = 'reservation_slot'
+class CartRecord(db.Model):
+    __tablename__ = 'cartrecord'
     id = Column(Integer,primary_key=True)
-    slug = Column(String)
-    time_from = Column(DateTime)
-    time_to = Column(DateTime)
-    exclude_days = Column(String)
-    number_of_slot = Column(Integer)
+    menu_id = Column(Integer)
+    slug=Column(String)
+    price=Column(Float)
+
 

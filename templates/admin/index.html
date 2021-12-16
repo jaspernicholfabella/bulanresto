@@ -1,0 +1,63 @@
+{%extends 'admin/master.html' %}
+
+{%block body%}
+<div style="margin-top: 2rem;display:flex; flex-wrap:wrap; align-items: center; justify-content: center;">
+{%if is_admin%}
+<div class="card  bg-primary mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
+  <div class="card-body">
+      <center>
+        <h5 class="card-title text-white">Total Number of Users</h5>
+        <h1 class="card-text text-white">{{total_no[0]}}</h1>
+      </center>
+  </div>
+</div>
+<div class="card text-white bg-warning mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
+  <div class="card-body">
+     <center>
+    <h5 class="card-title text-white">Total Restaurants</h5>
+    <h1 class="card-text text-white">{{total_no[1]}}</h1>
+     </center>
+  </div>
+</div>
+<div class="card text-white bg-info mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
+  <div class="card-body">
+      <center>
+        <h5 class="card-title text-white">Restaurant Requests</h5>
+        <h1 class="card-text text-white">{{total_no[2]}}</h1>
+      </center>
+  </div>
+</div>
+{%else%}
+<div class="card  bg-primary mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
+  <div class="card-body">
+      <center>
+        <h5 class="card-title text-white">Delivery Requests</h5>
+        <h1 class="card-text text-white">{{total_no[0]}}</h1>
+      </center>
+  </div>
+</div>
+<div class="card text-white bg-warning mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
+  <div class="card-body">
+     <center>
+    <h5 class="card-title text-white">Total Food Delivery</h5>
+    <h1 class="card-text text-white">{{total_no[1]}}</h1>
+     </center>
+  </div>
+</div>
+<div class="card text-white bg-info mb-3" style="min-width: 15rem;max-width: 20rem; margin-right:1rem; margin-left:1rem;">
+  <div class="card-body">
+      <center>
+        <h5 class="card-title text-white">Top Menu Item</h5>
+        <h1 class="card-text text-white">{{total_no[2]}}</h1>
+      </center>
+  </div>
+</div>
+{%endif%}
+
+</div>
+
+
+</div>
+
+
+{%endblock%}

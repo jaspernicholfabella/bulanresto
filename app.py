@@ -5,6 +5,7 @@ from flask_admin import Admin, form
 from sqlalchemy import Column, Integer, String, Float, Text,DateTime, BLOB,desc,asc, Boolean
 from flask_login import UserMixin, LoginManager, current_user, login_user, logout_user
 from flask_admin.menu import MenuLink
+from flask_admin import AdminIndexView, expose
 from PIL import Image
 from config import setup_app, config_data
 from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback
@@ -23,8 +24,49 @@ login = LoginManager(app)
 cart_data = []
 user_details = {}
 
+class HomeView(AdminIndexView):
+    search_menu = []
 
-admin = Admin(app, name=config_data["app_admin_name"], template_mode=config_data["app_admin_template_mode"])
+    def most_frequent(self,List):
+        return max(set(List), key=List.count)
+
+    def add_search_menu(self,str1):
+        str2 = str1.split('__')
+        temp = []
+        for str in str2:
+            temp.append(''.join([i for i in str if i.isalpha() or i.isspace()]))
+
+        for s in list(filter(None, temp)):
+            self.search_menu.append(s)
+
+    @expose('/')
+    def index(self):
+        if current_user.is_authenticated:
+            if current_user.access == 'admin':
+                total_no = []
+                total_no.append(User.query.count())
+                total_no.append(Restaurants.query.count())
+                total_no.append(RestaurantSignup.query.filter_by(approved=False).count())
+                return self.render('admin/index.html',total_no = total_no,is_admin=True )
+
+            elif current_user.access == 'restaurant':
+                total_no = []
+                total_no.append(Delivery.query.filter_by(delivered=False).count())
+                total_no.append(Delivery.query.filter_by(delivered=True).count())
+
+                delivery = Delivery.query.filter_by(delivered=True).filter_by(slug=current_user.name)
+                for delivered in delivery:
+                    self.add_search_menu(delivered.cartitems)
+
+                try:
+                    total_no.append(self.most_frequent(self.search_menu))
+                except:
+                    total_no.append('No Data Yet')
+
+                return self.render('admin/index.html',total_no=total_no, is_admin=False)
+
+
+admin = Admin(app, index_view=HomeView(), template_mode=config_data["app_admin_template_mode"])
 admin.add_view(RestaurantsModelView(Restaurants, db.session))
 admin.add_view(MenuItemsModelView(MenuItems, db.session))
 admin.add_view(RestaurantSignupModelView(RestaurantSignup,db.session, name='Restaurant Account Requests'))
@@ -32,6 +74,8 @@ admin.add_view(UserModelView(User, db.session))
 admin.add_view(DeliveryModelView(Delivery, db.session, name="Delivery Request"))
 admin.add_view(DeliveryModelView2(Delivery, db.session, name="Delivery Record", endpoint='record'))
 admin.add_link(MenuLink(name='Logout', category='', url="/logout"))
+
+
 
 @app.context_processor
 def default_contents():
@@ -44,8 +88,7 @@ def default_contents():
                 home_subtitle= home_subtitle,
                 home_card_title = home_card_title,
                 home_card_subtitle=home_card_subtitle,
-                restaurant_list_title=restaurant_list_title
-                )
+                restaurant_list_title=restaurant_list_title)
 
 @login.user_loader
 def load_user(user_id):
@@ -80,7 +123,6 @@ def home():
     random_resto_2 = restaurant[random_number_2]
     menu_item_1 = MenuItems.query.filter_by(slug=random_resto_1.slug).all()
     menu_item_2 = MenuItems.query.filter_by(slug=random_resto_2.slug).all()
-
 
     return render_template('index.html',random_resto=[random_resto_1,random_resto_2],menu_item =[menu_item_1,menu_item_2],is_login=is_login)
 
@@ -146,8 +188,13 @@ def login():
                 if user.access == 'user':
                     return redirect(url_for("home"),)
                 elif user.access == 'restaurant':
+                    total_no = []
                     return redirect(url_for("admin.index"))
                 elif user.access == 'admin':
+                    total_no = []
+                    total_no.append(User.query.count())
+                    total_no.append(Restaurants.query.count())
+                    total_no.append(RestaurantSignup.query.count())
                     return redirect(url_for("admin.index"))
             else:
                 error = 'Username or Password is Incorrect'
@@ -155,7 +202,6 @@ def login():
         except Exception as e:
             error = 'Username or Password is Incorrect'
             return render_template("login.html", form=form, error=error)
-
     return render_template("login.html", form=form, error=error)
 
 @app.route('/logout')
@@ -223,12 +269,25 @@ def restaurant_list():
     if current_user.is_authenticated:
         if current_user.access == 'user':
             is_login = True
+
     restaurant_list = Restaurants.query.order_by(asc(Restaurants.title))
     filtered_restaurant_list = []
+    rate_dict = {}
     for restaurant in restaurant_list:
-
+        total = 0
+        i = 0
+        feedback = Feedback.query.filter_by(slug=restaurant.slug)
+        try:
+            for f in feedback:
+                total += f.rate
+                i+=1
+            av = total / i
+            rate_dict.update({restaurant.slug:av})
+        except:
+            rate_dict.update({restaurant.slug:total})
         filtered_restaurant_list.append(restaurant)
-    return render_template('restaurant_list.html', restaurant_list=filtered_restaurant_list,is_login=is_login)
+
+    return render_template('restaurant_list.html', restaurant_list=filtered_restaurant_list,rate_dict=rate_dict,is_login=is_login)
 
 @app.route('/restaurant/<string:slug>',methods=['GET','POST'])
 def restaurantpage(slug):
@@ -238,8 +297,13 @@ def restaurantpage(slug):
         if current_user.access == 'user':
             is_login = True
             if form.validate_on_submit():
+                if len(form.feedback_name.data) < 1:
+                    name = current_user.name
+                else:
+                    name = form.feedback_name.data
+
                 feedback_query = Feedback(
-                    username=current_user.name,
+                    username=name,
                     slug=slug,
                     rate=float(form.rate.data),
                     comment=form.message.data

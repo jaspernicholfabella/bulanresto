@@ -4,10 +4,7 @@ from wtforms.validators import DataRequired, ValidationError,Email, EqualTo,Requ
 from wtforms.fields.html5 import EmailField
 from wtforms_validators import AlphaNumeric,Alpha
 from flask_wtf.file import FileField, FileRequired
-
 from flask import Markup
-
-
 
 class SignupForm(FlaskForm):
     user_name = StringField('User Name',render_kw={"placeholder": "Username"}, validators=[DataRequired(),
@@ -42,5 +39,6 @@ class SearchForm(FlaskForm):
 
 
 class FeedbackForm(FlaskForm):
+    feedback_name = StringField('Name',render_kw={"placeholder":"Name"})
     rate = IntegerField('Rate',render_kw={"placeholder": "Rate from 1 - 5", "type" : "number"},validators=[NumberRange(1,5,message='You can only rate from 1 - 5')])
     message = TextAreaField('Message',render_kw={"placeholder":"Write a Comment..."},validators=[DataRequired()])

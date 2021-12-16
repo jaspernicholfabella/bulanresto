@@ -5,7 +5,7 @@ basedir = os.getcwd()
 
 config_data = {
     "app_admin_name": 'Bulan Restaurant Portal Admin',
-    "app_admin_template_mode": "bootstrap3",
+    "app_admin_template_mode": "bootstrap4",
     "access_deny_message": "Access Denied!, you need to Login First!",
     "basedir":os.getcwd(),
     "image_file_path": os.path.join(basedir,'static\\images'),
@@ -28,8 +28,7 @@ def setup_app():
     app.config['MAX_CONTENT_PATH'] = config_data["max_upload_size"]
     ##Secret Key for Authentication
     app.config['SECRET_KEY'] = 'mysecretkey'
-    ##app admin look
-    app.config['FLASK_ADMIN_SWATCH'] = 'superhero'
-
+    ##app admin look , pulse,
+    app.config['FLASK_ADMIN_SWATCH'] = 'lux'
     return app
 
