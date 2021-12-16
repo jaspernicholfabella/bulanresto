@@ -73,17 +73,17 @@ class CartRecord(db.Model):
     menu_name = Column(String)
     slug=Column(String)
     price=Column(Float)
-
-class ReservationSetup(db.Model):
-    __tablename__ = 'reservation_setup'
-    id = Column(Integer,primary_key=True)
-    month = String(unique=True)
-    skip_dates = String()
-    business_hours_start=(String())
-    business_hours_end=(String())
-    table_slots = Integer()
-
-class Reservations(db.Model):
-    __tablename__ = 'reservations'
+#
+# class ReservationSetup(db.Model):
+#     __tablename__ = 'reservation_setup'
+#     id = Column(Integer,primary_key=True)
+#     month = String(unique=True)
+#     skip_dates = String()
+#     business_hours_start=(String())
+#     business_hours_end=(String())
+#     table_slots = Integer()
+#
+# class Reservations(db.Model):
+#     __tablename__ = 'reservations'
 
 
