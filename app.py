@@ -8,11 +8,11 @@ from flask_admin.menu import MenuLink
 from flask_admin import AdminIndexView, expose
 from PIL import Image
 from config import setup_app, config_data
-from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback
+from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback,CartRecord
 from view import RestaurantsModelView,MenuItemsModelView,UserModelView,RestaurantSignupModelView,DeliveryModelView,DeliveryModelView2
 import random
 import datetime
-from forms import SignupForm,LoginForm,RestaurantSignupForm,SearchForm,FeedbackForm
+from forms import SignupForm,LoginForm,RestaurantSignupForm,SearchForm,FeedbackForm,CartForm
 
 
 app = setup_app()
@@ -21,8 +21,9 @@ app.config['MAX_CONTENT_PATH'] = config_data["max_upload_size"]
 
 db = SQLAlchemy(app)
 login = LoginManager(app)
-cart_data = []
 user_details = {}
+global current_slug
+current_slug=''
 
 class HomeView(AdminIndexView):
     search_menu = []
@@ -107,12 +108,19 @@ def db_drop():
     print('Database dropped!')
 
 
+def empty_cart_data():
+    global current_slug
+    current_slug = ''
+    num_rows_deleted = db.session.query(CartRecord).delete()
+    db.session.commit()
+
 ## ROUTES
 @app.route('/')
 def home():
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
+            empty_cart_data()
             is_login = True
 
 
@@ -241,10 +249,12 @@ def restosignup():
 
 @app.route('/search',methods=["POST","GET"])
 def searchpage():
+
     form = SearchForm()
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
+            empty_cart_data()
             is_login = True
     is_result_empty = True
     menu_items = []
@@ -265,9 +275,11 @@ def searchpage():
 
 @app.route('/restaurant_list')
 def restaurant_list():
+    empty_cart_data()
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
+            empty_cart_data()
             is_login = True
 
     restaurant_list = Restaurants.query.order_by(asc(Restaurants.title))
@@ -289,13 +301,41 @@ def restaurant_list():
 
     return render_template('restaurant_list.html', restaurant_list=filtered_restaurant_list,rate_dict=rate_dict,is_login=is_login)
 
+
 @app.route('/restaurant/<string:slug>',methods=['GET','POST'])
 def restaurantpage(slug):
+    global current_slug
     form = FeedbackForm()
+    cart_form = CartForm()
+
     is_login = False
     if current_user.is_authenticated:
         if current_user.access == 'user':
             is_login = True
+            if current_slug != '':
+                if (current_slug != slug):
+                    current_slug == slug
+                    num_rows_deleted = db.session.query(CartRecord).delete()
+                    db.session.commit()
+                else:
+                    if cart_form.validate_on_submit():
+                        add_cart_record = CartRecord(
+                            menu_name=cart_form.menu_name.data,
+                            slug = slug,
+                            price = float(cart_form.price.data))
+                        db.session.add(add_cart_record)
+                        db.session.commit()
+            else:
+                current_slug = slug
+                if cart_form.validate_on_submit():
+                    add_cart_record = CartRecord(
+                        menu_name=cart_form.menu_name.data,
+                        slug=slug,
+                        price=float(cart_form.price.data))
+                    db.session.add(add_cart_record)
+                    db.session.commit()
+
+
             if form.validate_on_submit():
                 if len(form.feedback_name.data) < 1:
                     name = current_user.name
@@ -313,12 +353,12 @@ def restaurantpage(slug):
                 return render_template("messages.html",no_button=True,message_title=f"COMMENT SUBMITTED!",
                                        message_subtitle="Your comment has been submitted", is_error=False)
 
-    cart_data.clear()
+
 
     restaurant = Restaurants.query.filter_by(slug=slug).one()
     menu_items = MenuItems.query.filter_by(slug=slug).order_by(asc(MenuItems.name))
     comments = Feedback.query.filter_by(slug=slug).order_by(asc(Feedback.username))
-    return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items,comments=comments,is_login=is_login,cart_data_len=0,form=form)
+    return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items,comments=comments,is_login=is_login,cart_data_len=CartRecord.query.count(),form=form)
 
 @app.route('/login_error')
 def login_error():
@@ -330,49 +370,21 @@ def login_error_2():
     return render_template("messages.html",no_button=False, message_title=f"CANNOT COMMENT OR RATE!",
                            message_subtitle="You should login first to use this function", is_error=True)
 
-@app.route('/addtocart',methods=["POST","GET"])
-def addtocart():
-    form = FeedbackForm()
-    is_login = False
-    if current_user.is_authenticated:
-        if current_user.access == 'user':
-            is_login = True
-    try:
-        if request.method == "POST":
-            id = int(request.form["submit_button"])
-            test_q = MenuItems.query.filter_by(id=id).first()
-            slug = test_q.slug
-            cart_data.append(id)
-            print(f'cart_data: {cart_data}')
-            restaurant = Restaurants.query.filter_by(slug=slug).one()
-            menu_items = MenuItems.query.filter_by(slug=slug).order_by(asc(MenuItems.name))
-            try:
-                comments = Feedback.query.filter_by(slug=slug).order_by(asc(Feedback.username))
-            except:
-                comments={}
-            return render_template('restaurant.html', restaurant=restaurant, menu_items=menu_items, comments=comments,
-                                   is_login=is_login, cart_data_len=len(cart_data), form=form)
-
-
-    except Exception as e:
-        return render_template("messages.html",no_button=True, message_title=f"SOMETHING WENT WRONG!",
-                           message_subtitle=f"{e}", is_error=True, no_buttons=False)
-
-    return render_template("messages.html",no_button=True, message_title=f"SOMETHING WENT WRONG!",
-                           message_subtitle=f"common errors: Refreshing page while adding item to cart can cause this.", is_error=True)
 
 @app.route('/cart/<string:slug>')
 def cart(slug):
-    tempdict = {i:cart_data.count(i) for i in cart_data}
+    cart_data = CartRecord.query.all()
     cart_data_list=[]
-    for k,v in tempdict.items():
-        menu_items = MenuItems.query.filter_by(id=int(k)).first()
+    for data in cart_data:
         cart_data_list.append({
-            'name' : menu_items.name,
-            'amount' : v,
-            'price' : int(str(menu_items.price).replace('PHP','').strip())
+            'name' : data.menu_name,
+            'amount' : CartRecord.query.filter_by(menu_name=data.menu_name).count(),
+            'price' : data.price
         })
-    return render_template("cart.html",cart_data_list=cart_data_list,slug=slug)
+    no_dup_cart_data_list = [i for n, i in enumerate(cart_data_list) if i not in cart_data_list[n + 1:]]
+
+    return render_template("cart.html",cart_data_list=no_dup_cart_data_list,slug=slug)
+
 
 @app.route('/cart')
 def empty_cart():

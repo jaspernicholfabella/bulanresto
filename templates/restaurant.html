@@ -67,14 +67,17 @@
                             </div>
                             {% if not is_login%}
                             <div class="mbr-section-btn item-footer mt-2">
-                                <a href="/login_error" class="btn item-btn btn-white-outline display-4" target="_blank">
+                                <a href="/login_error" class="btn item-btn btn-white-outline display-4" >
                                     <span class="mbrib-cart-add mbr-iconfont mbr-iconfont-btn"></span>Add&nbsp;
                                 </a>
                             </div>
                             {%else%}
-                            <form class="mbr-section-btn item-footer mt-2"method ="post" action="/addtocart">
+                            <form class="mbr-section-btn item-footer mt-2" method ="post" action="">
                                 <center>
-                                <button type="submit" name="submit_button" value="{{item.id}}"  class="btn item-btn btn-white-outline display-4" target="_blank">
+                                {{form.hidden_tag()}}
+                                <input type="hidden" value="{{item.name}}" name="menu_name"/>
+                                <input type="hidden" value={{item.price}} name="price"/>
+                                <button type="submit" name="submit_button" class="btn item-btn btn-white-outline display-4">
                                     <span class="mbrib-cart-add mbr-iconfont mbr-iconfont-btn"></span>Add
                                 </button>
                                 </center>

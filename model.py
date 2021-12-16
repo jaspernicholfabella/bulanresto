@@ -70,7 +70,7 @@ class Feedback(db.Model):
 class CartRecord(db.Model):
     __tablename__ = 'cartrecord'
     id = Column(Integer,primary_key=True)
-    menu_id = Column(Integer)
+    menu_name = Column(String)
     slug=Column(String)
     price=Column(Float)
 

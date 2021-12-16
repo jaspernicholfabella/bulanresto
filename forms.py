@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField,PasswordField,SubmitField,SelectField,FileField,IntegerField,TextAreaField
+from wtforms import StringField,PasswordField,SubmitField,SelectField,FileField,IntegerField,TextAreaField,HiddenField
 from wtforms.validators import DataRequired, ValidationError,Email, EqualTo,Required,InputRequired,Length,NumberRange
 from wtforms.fields.html5 import EmailField
 from wtforms_validators import AlphaNumeric,Alpha
@@ -36,6 +36,11 @@ class RestaurantSignupForm(FlaskForm):
 
 class SearchForm(FlaskForm):
     search_string= StringField('Search', validators=[DataRequired()])
+
+class CartForm(FlaskForm):
+    menu_name = HiddenField()
+    price = HiddenField()
+
 
 
 class FeedbackForm(FlaskForm):
