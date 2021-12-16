@@ -8,8 +8,8 @@ from flask_admin.menu import MenuLink
 from flask_admin import AdminIndexView, expose
 from PIL import Image
 from config import setup_app, config_data
-from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback,CartRecord
-from view import RestaurantsModelView,MenuItemsModelView,UserModelView,RestaurantSignupModelView,DeliveryModelView,DeliveryModelView2
+from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback,CartRecord,ReservationSetup
+from view import RestaurantsModelView,MenuItemsModelView,UserModelView,RestaurantSignupModelView,DeliveryModelView,DeliveryModelView2,ReservationSetupModelView
 import random
 import datetime
 from forms import SignupForm,LoginForm,RestaurantSignupForm,SearchForm,FeedbackForm,CartForm
@@ -68,6 +68,7 @@ class HomeView(AdminIndexView):
 
 
 admin = Admin(app, index_view=HomeView(), template_mode=config_data["app_admin_template_mode"])
+admin.add_view(ReservationSetupModelView(ReservationSetup,db.session, name='Reservation Setup'))
 admin.add_view(RestaurantsModelView(Restaurants, db.session))
 admin.add_view(MenuItemsModelView(MenuItems, db.session))
 admin.add_view(RestaurantSignupModelView(RestaurantSignup,db.session, name='Restaurant Account Requests'))
@@ -108,6 +109,16 @@ def db_drop():
     print('Database dropped!')
 
 
+class ReservationSetup(db.Model):
+    __tablename__ = 'reservation_setup'
+    id = Column(Integer,primary_key=True)
+    option_update = Column(String)
+    business_hours_start= Column(String)
+    business_hours_end= Column(String)
+    skip_weekends = Column(Boolean,default=False)
+    slug=Column(String)
+    table_slots = Column(Integer)
+
 def empty_cart_data():
     global current_slug
     current_slug = ''
@@ -134,13 +145,18 @@ def home():
 
     return render_template('index.html',random_resto=[random_resto_1,random_resto_2],menu_item =[menu_item_1,menu_item_2],is_login=is_login)
 
-@app.route('/reservation')
-def reservation():
+@app.route('/reservation/<string:slug>')
+def reservation(slug):
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            return render_template('reservation.html')
+            restaurant = Restaurants.query.filter_by(slug=slug).one()
+            return render_template('reservation.html',restaurant=restaurant)
     else:
-        return config_data["access_deny_message"]
+        return render_template("messages.html",no_buttons=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Login First",is_error=True)
+
+    return render_template("messages.html", no_buttons=False, message_title=f"REQUEST DENIED.",
+                           message_subtitle=f"Login First", is_error=True)
+
 
 @app.route('/signup',methods=["POST","GET"])
 def signup():
@@ -312,6 +328,26 @@ def restaurantpage(slug):
     if current_user.is_authenticated:
         if current_user.access == 'user':
             is_login = True
+
+            if form.validate_on_submit():
+                if len(form.feedback_name.data) < 1:
+                    name = current_user.name
+                else:
+                    name = form.feedback_name.data
+
+                feedback_query = Feedback(
+                    username=name,
+                    slug=slug,
+                    rate=float(form.rate.data),
+                    comment=form.message.data
+                )
+                db.session.add(feedback_query)
+                db.session.commit()
+                return render_template("messages.html",no_button=True,message_title=f"COMMENT SUBMITTED!",
+                                       message_subtitle="Your comment has been submitted", is_error=False)
+
+
+
             if current_slug != '':
                 if (current_slug != slug):
                     current_slug == slug
@@ -336,22 +372,7 @@ def restaurantpage(slug):
                     db.session.commit()
 
 
-            if form.validate_on_submit():
-                if len(form.feedback_name.data) < 1:
-                    name = current_user.name
-                else:
-                    name = form.feedback_name.data
 
-                feedback_query = Feedback(
-                    username=name,
-                    slug=slug,
-                    rate=float(form.rate.data),
-                    comment=form.message.data
-                )
-                db.session.add(feedback_query)
-                db.session.commit()
-                return render_template("messages.html",no_button=True,message_title=f"COMMENT SUBMITTED!",
-                                       message_subtitle="Your comment has been submitted", is_error=False)
 
 
 

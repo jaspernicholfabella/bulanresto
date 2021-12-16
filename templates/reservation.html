@@ -1,0 +1,66 @@
+
+{%extends "base.html"%}
+{%block content%}
+<section data-bs-version="5.1" class="form8 cid-sRJIqQvwZk" id="form8-2q">
+    <div class="mbr-overlay"></div>
+    <div class="container">
+        <div class="mbr-section-head">
+            <h3 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2"><strong>Reserve a Seat at {{restaurant.title}}</strong></h3>
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-lg-8 mx-auto mbr-form" data-form-type="formoid">
+
+                <form action="" method="POST" class="mbr-form form-with-styler mx-auto" data-form-title="Form Name"><input type="hidden" name="email" data-form-email="true" value="iWriiQ36RXEEVLcuP18kJ0rFKcMfLK/olJoY1cm92L3uNx1jw1hJA657pvw0N74g1t08Hrp27Z1OFzB60q4ZEZ4kTpwZFnQbvQgFqHHj+dS1OW6MFCbBzI/4a+G/VzAd">
+                    <div class="dragArea row">
+                        <div class="col-lg-4 col-md-12 col-sm-12 form-group mb-3" data-for="name">
+                            <input type="text" name="name" placeholder="Month" data-form-field="name" class="form-control" value="" id="name-form8-2q">
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12 form-group mb-3" data-for="email">
+                            <input type="email" name="email" placeholder="Day" data-form-field="email" class="form-control" value="" id="email-form8-2q">
+                        </div>
+                        <div class="col-lg-4 col-md-12 col-sm-12 mbr-section-btn align-center"><button type="submit" class="btn btn-white-outline display-4"><span class="mbrib-calendar mbr-iconfont mbr-iconfont-btn"></span>Check for Slots</button></div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<section data-bs-version="5.1" class="slider4 mbr-embla cid-sRJHF8of7k" id="slider4-2p">
+    <div class="mbr-overlay"></div>
+    <div class="position-relative text-center">
+        <div class="mbr-section-head">
+            <h4 class="mbr-section-title mbr-fonts-style align-center mb-0 display-2">
+                <strong>Available Time Slots for</strong></h4>
+            <h5 class="mbr-section-subtitle mbr-fonts-style align-center mb-0 mt-2 display-5">December 16, 2021</h5>
+        </div>
+        <div class="embla mt-4" data-skip-snaps="true" data-align="center" data-contain-scroll="trimSnaps" data-auto-play-interval="5" data-draggable="true">
+            <div class="embla__viewport container-fluid">
+                <div class="embla__container">
+                    {%for i in range(0,5)%}
+                    <div class="embla__slide slider-image item" style="margin-left: 0; margin-right: 0;">
+                        <div class="slide-content" style="padding:4rem 2rem;">
+                            <div class="item-content">
+                                <h5 class="item-title mbr-fonts-style display-5"><strong>8:00 - 9:00</strong></h5>
+                                <p class="mbr-text mbr-fonts-style mt-3 display-7">Avaiable Slots: 3</p>
+                            </div>
+                            <div class="mbr-section-btn item-footer mt-2"><a href="" class="btn item-btn btn-white-outline display-4" target="_blank"><span class="mobi-mbri mobi-mbri-calendar mbr-iconfont mbr-iconfont-btn"></span>Reserve&nbsp;</a></div>
+                        </div>
+                    </div>
+                    {%endfor%}
+                </div>
+            </div>
+            <button class="embla__button embla__button--prev">
+                <span class="mobi-mbri mobi-mbri-arrow-prev mbr-iconfont" aria-hidden="true"></span>
+                <span class="sr-only visually-hidden visually-hidden">Previous</span>
+            </button>
+            <button class="embla__button embla__button--next">
+                <span class="mobi-mbri mobi-mbri-arrow-next mbr-iconfont" aria-hidden="true"></span>
+                <span class="sr-only visually-hidden visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+{%endblock%}

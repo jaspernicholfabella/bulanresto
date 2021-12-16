@@ -42,8 +42,11 @@ class CartForm(FlaskForm):
     price = HiddenField()
 
 
-
 class FeedbackForm(FlaskForm):
     feedback_name = StringField('Name',render_kw={"placeholder":"Name"})
     rate = IntegerField('Rate',render_kw={"placeholder": "Rate from 1 - 5", "type" : "number"},validators=[NumberRange(1,5,message='You can only rate from 1 - 5')])
     message = TextAreaField('Message',render_kw={"placeholder":"Write a Comment..."},validators=[DataRequired()])
+
+
+class ReservationForm(FlaskForm):
+    month = SelectField()
