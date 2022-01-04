@@ -2,18 +2,19 @@ import os
 from flask import Flask,abort,url_for,render_template,request,redirect,g
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin, form
-from sqlalchemy import Column, Integer, String, Float, Text,DateTime, BLOB,desc,asc, Boolean
+from sqlalchemy import Column, Integer, String, Float, Text,DateTime, BLOB,desc,asc, Boolean,func
 from flask_login import UserMixin, LoginManager, current_user, login_user, logout_user
 from flask_admin.menu import MenuLink
 from flask_admin import AdminIndexView, expose
 from PIL import Image
 from config import setup_app, config_data
-from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback,CartRecord,ReservationSetup
-from view import RestaurantsModelView,MenuItemsModelView,UserModelView,RestaurantSignupModelView,DeliveryModelView,DeliveryModelView2,ReservationSetupModelView
+from model import User,MenuItems,RestaurantSignup,Restaurants,Delivery,Feedback,CartRecord,ReservationSetup,Reservations
+from view import RestaurantsModelView,MenuItemsModelView,UserModelView,RestaurantSignupModelView,DeliveryModelView,DeliveryModelView2,ReservationSetupModelView,ReservationModelView
 import random
 import datetime
-from forms import SignupForm,LoginForm,RestaurantSignupForm,SearchForm,FeedbackForm,CartForm
-
+from forms import SignupForm,LoginForm,RestaurantSignupForm,SearchForm,FeedbackForm,CartForm,ReservationForm,DateRangeForm
+from reservation_setup import setup_reservations
+from dateutil.relativedelta import relativedelta
 
 app = setup_app()
 app.config['UPLOAD_FOLDER'] = config_data["upload_folder"]
@@ -40,7 +41,7 @@ class HomeView(AdminIndexView):
         for s in list(filter(None, temp)):
             self.search_menu.append(s)
 
-    @expose('/')
+    @expose('/',methods=['GET','POST'])
     def index(self):
         if current_user.is_authenticated:
             if current_user.access == 'admin':
@@ -52,19 +53,189 @@ class HomeView(AdminIndexView):
 
             elif current_user.access == 'restaurant':
                 total_no = []
-                total_no.append(Delivery.query.filter_by(delivered=False).count())
-                total_no.append(Delivery.query.filter_by(delivered=True).count())
 
-                delivery = Delivery.query.filter_by(delivered=True).filter_by(slug=current_user.name)
-                for delivered in delivery:
+                #top menu item this month 0
+                temp_date_from = datetime.date.today().replace(day=1)
+                temp_date_to = datetime.date.today() + relativedelta(months=+1)
+                delivery_month = Delivery.query.filter(Delivery.date >= temp_date_from).filter(Delivery.date < temp_date_to).filter_by(delivered=True).filter_by(slug=current_user.name)
+                self.search_menu = []
+                for delivered in delivery_month:
                     self.add_search_menu(delivered.cartitems)
-
                 try:
                     total_no.append(self.most_frequent(self.search_menu))
                 except:
                     total_no.append('No Data Yet')
 
-                return self.render('admin/index.html',total_no=total_no, is_admin=False)
+                #top menu item of all time 1
+                delivery = Delivery.query.filter_by(delivered=True).filter_by(slug=current_user.name)
+                self.search_menu=[]
+                for delivered in delivery:
+                    self.add_search_menu(delivered.cartitems)
+                try:
+                    total_no.append(self.most_frequent(self.search_menu))
+                except:
+                    total_no.append('No Data Yet')
+
+                #Delivery Requests 2
+                total_no.append(Delivery.query.filter_by(delivered=False).filter_by(slug=current_user.name).count())
+                #Food Delivered Today 3
+                total_no.append(Delivery.query.filter(
+                    func.date(Delivery.date) == datetime.date.today()
+                ).filter_by(delivered=True).filter_by(slug=current_user.name).count())
+                #Food Delivered This Month 4
+                total_no.append(
+                Delivery.query.filter(Delivery.date >= temp_date_from)\
+                    .filter(Delivery.date < temp_date_to)\
+                    .filter_by(delivered=True).filter_by(slug=current_user.name).count())
+                #total food Delivered 5
+                total_no.append(Delivery.query.filter_by(delivered=True).filter_by(slug=current_user.name).count())
+
+                #reservations today 6
+                total_no.append(Reservations.query.filter(
+                    func.date(Reservations.reservation_date_and_time) == datetime.date.today()
+                ).filter_by(slug=current_user.name).count())
+
+                #reservations this month 7
+                total_no.append(Reservations.query.filter(Reservations.reservation_date_and_time >= temp_date_from)\
+                                .filter(Reservations.reservation_date_and_time < temp_date_to)
+                                .filter_by(slug=current_user.name).count())
+
+                #all reservations 8
+                total_no.append(Reservations.query.filter_by(slug=current_user.name).count())
+
+                form = DateRangeForm()
+
+                if form.validate_on_submit():
+                    #2021-12-01 2022-01-31
+                    temp_date_from = datetime.datetime.strptime(form.date_from.data,'%Y-%m-%d')
+                    temp_date_to = datetime.datetime.strptime(form.date_to.data,'%Y-%m-%d')
+                    no_product = 0
+                    food_delivery = 0
+                    delivery = Delivery.query.filter(Delivery.date >= temp_date_from)\
+                                .filter(Delivery.date < temp_date_to).filter_by(delivered=True).filter_by(slug=current_user.name)
+                    self.search_menu = []
+
+                    for delivered in delivery:
+                        self.add_search_menu(delivered.cartitems)
+                        cartitems_ar = delivered.cartitems.split('::')
+                        cartitems_ar = [x for x in cartitems_ar if x]
+                        for item in cartitems_ar:
+                            no_product += int(item.split('__')[1])
+
+                    try:
+                        top_menu_item = self.most_frequent(self.search_menu)
+                        food_delivery = len(self.search_menu)
+                    except:
+                        top_menu_item = 'No Data Yet'
+
+                    # reservations today 6
+                    reservations = Reservations.query.filter(Reservations.reservation_date_and_time >= temp_date_from)\
+                                .filter(Reservations.reservation_date_and_time < temp_date_to).filter_by(slug=current_user.name).count()
+
+                    delivery_record = Delivery.query.filter(Delivery.date >= temp_date_from)\
+                                .filter(Delivery.date < temp_date_to).filter_by(delivered=True).filter_by(slug=current_user.name)
+
+                    total_sales = 0
+                    for delivery in delivery_record:
+                        total_sales += delivery.total
+
+                    return self.render('admin/records.html',
+                                       type='',
+                                       top_menu_item=top_menu_item,
+                                       no_product=no_product,
+                                       food_delivery=food_delivery,
+                                       reservations=reservations,
+                                       delivery_record=delivery_record,
+                                       total_sales=total_sales,
+                                       date_range = f'{temp_date_from.strftime("%b %d, %Y")} - {temp_date_to.strftime("%b %d, %Y")}'
+                                       )
+
+
+
+
+                return self.render('admin/index.html',total_no=total_no, is_admin=False,form=form)
+
+    @expose('/records/<string:type>')
+    def records(self,type):
+        if current_user.is_authenticated:
+            if current_user.access == 'restaurant':
+                if type == 'daily':
+                    #top menu item this month 0
+                    no_product = 0
+                    food_delivery = 0
+                    delivery = Delivery.query.filter(
+                        func.date(Delivery.date) == datetime.date.today()
+                    ).filter_by(delivered=True).filter_by(slug=current_user.name)
+                    self.search_menu = []
+
+                    for delivered in delivery:
+                        self.add_search_menu(delivered.cartitems)
+                        cartitems_ar = delivered.cartitems.split('::')
+                        cartitems_ar = [x for x in cartitems_ar if x]
+                        for item in cartitems_ar:
+                            no_product += int(item.split('__')[1])
+
+                    try:
+                        top_menu_item = self.most_frequent(self.search_menu)
+                        food_delivery = len(self.search_menu)
+                    except:
+                        top_menu_item = 'No Data Yet'
+
+                    #reservations today 6
+                    reservations = Reservations.query.filter(
+                        func.date(Reservations.reservation_date_and_time) == datetime.date.today()
+                    ).filter_by(slug=current_user.name).count()
+
+                    delivery_record = Delivery.query.filter(
+                        func.date(Delivery.date) == datetime.date.today()
+                    ).filter_by(delivered=True).filter_by(slug=current_user.name)
+
+                    total_sales = 0
+                    for delivery in delivery_record:
+                        total_sales += delivery.total
+
+
+                elif type == "all":
+                    # top menu item this month 0
+                    no_product = 0
+                    food_delivery = 0
+                    delivery = Delivery.query.filter_by(delivered=True).filter_by(slug=current_user.name)
+                    self.search_menu = []
+
+                    for delivered in delivery:
+                        self.add_search_menu(delivered.cartitems)
+                        cartitems_ar = delivered.cartitems.split('::')
+                        cartitems_ar = [x for x in cartitems_ar if x]
+                        for item in cartitems_ar:
+                            no_product += int(item.split('__')[1])
+
+                    try:
+                        top_menu_item = self.most_frequent(self.search_menu)
+                        food_delivery = len(self.search_menu)
+                    except:
+                        top_menu_item = 'No Data Yet'
+
+                    # reservations today 6
+                    reservations = Reservations.query.filter_by(slug=current_user.name).count()
+
+                    delivery_record = Delivery.query.filter_by(delivered=True).filter_by(slug=current_user.name)
+
+                    total_sales = 0
+                    for delivery in delivery_record:
+                        total_sales += delivery.total
+
+
+                return self.render('admin/records.html',
+                                   type=type,
+                                   top_menu_item=top_menu_item,
+                                   no_product = no_product,
+                                   food_delivery=food_delivery,
+                                   reservations=reservations,
+                                   delivery_record=delivery_record,
+                                   total_sales = total_sales,
+                                   date_range=''
+                                   )
+
 
 
 admin = Admin(app, index_view=HomeView(), template_mode=config_data["app_admin_template_mode"])
@@ -73,6 +244,7 @@ admin.add_view(RestaurantsModelView(Restaurants, db.session))
 admin.add_view(MenuItemsModelView(MenuItems, db.session))
 admin.add_view(RestaurantSignupModelView(RestaurantSignup,db.session, name='Restaurant Account Requests'))
 admin.add_view(UserModelView(User, db.session))
+admin.add_view(ReservationModelView(Reservations,db.session))
 admin.add_view(DeliveryModelView(Delivery, db.session, name="Delivery Request"))
 admin.add_view(DeliveryModelView2(Delivery, db.session, name="Delivery Record", endpoint='record'))
 admin.add_link(MenuLink(name='Logout', category='', url="/logout"))
@@ -108,16 +280,16 @@ def db_drop():
     db.drop_all()
     print('Database dropped!')
 
-
 class ReservationSetup(db.Model):
     __tablename__ = 'reservation_setup'
     id = Column(Integer,primary_key=True)
     option_update = Column(String)
     business_hours_start= Column(String)
     business_hours_end= Column(String)
+    gap_in_minutes = Column(Integer,default=60)
     skip_weekends = Column(Boolean,default=False)
     slug=Column(String)
-    table_slots = Column(Integer)
+    table_slots = Column(Integer,default=1)
 
 def empty_cart_data():
     global current_slug
@@ -145,18 +317,83 @@ def home():
 
     return render_template('index.html',random_resto=[random_resto_1,random_resto_2],menu_item =[menu_item_1,menu_item_2],is_login=is_login)
 
-@app.route('/reservation/<string:slug>')
+
+@app.route('/reservation/<string:slug>',methods=["POST","GET"])
 def reservation(slug):
+    try:
+        if current_user.is_authenticated:
+            if current_user.access == 'user':
+                restaurant = Restaurants.query.filter_by(slug=slug).one()
+                reservation = ReservationSetup.query.filter_by(slug=slug).one()
+                reservation_month_day,reservation_hours =setup_reservations(
+                    option_update=reservation.option_update,
+                    skip_weekends=reservation.skip_weekends,
+                    business_hours_start_string=reservation.business_hours_start,
+                    business_hours_end_string=reservation.business_hours_end,
+                    gap_in_minutes=reservation.gap_in_minutes
+                )
+                form = ReservationForm()
+
+                if form.validate_on_submit():
+                    # User.query.filter_by(username=form.user_name.data).count()
+                    date_selected = f'{form.month.data} {form.day.data}, {datetime.datetime.now().year}'
+
+                    time_slots = {}
+                    for i in range(0,len(reservation_hours) - 1):
+                        date_selected_dt = datetime.datetime.strptime(f'{str(form.month.data)[:3]} {form.day.data} {datetime.datetime.now().year} {reservation_hours[i]}','%b %d %Y %I:%M %p')
+                        slot_for_the_day = Reservations.query.filter_by(reservation_date_and_time=date_selected_dt).filter_by(slug=slug).count()
+                        slot_available = reservation.table_slots - slot_for_the_day
+
+                        if slot_available > 0:
+                            time_slots.update({f'{str(reservation_hours[i]).replace(" ","")} - {str(reservation_hours[i+1]).replace(" ","")}':slot_available})
+
+                    return render_template('reservation.html',
+                                           restaurant=restaurant,
+                                           time_slots=time_slots,
+                                           reservation_month_day=reservation_month_day,
+                                           form=form,
+                                           date_selected = date_selected,
+                                           show_data=True)
+
+                return render_template('reservation.html',
+                                       restaurant=restaurant,
+                                       reservation_month_day=reservation_month_day,
+                                       form=form,
+                                       show_data=False)
+        else:
+            return render_template("messages.html",no_button=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Login First",is_error=True)
+    except Exception as e:
+        return render_template("messages.html", no_button=True, message_title=f"REQUEST DENIED. No Reservations as of this moment",
+                               message_subtitle=f"Error: {e}", is_error=True)
+    return render_template("messages.html",no_button=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Login First",is_error=True)
+
+@app.route('/reserve/<string:slug>/<string:date_time_slot>')
+def reserve(slug,date_time_slot):
     if current_user.is_authenticated:
         if current_user.access == 'user':
-            restaurant = Restaurants.query.filter_by(slug=slug).one()
-            return render_template('reservation.html',restaurant=restaurant)
-    else:
-        return render_template("messages.html",no_buttons=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Login First",is_error=True)
+            try:
+                time=date_time_slot.split('-')[0].strip()
+                date = date_time_slot.split('-')[2].strip()
+                month = date.split(' ')[0][:3].lower()
+                day = date.split(' ')[1].replace(',','').strip()
+                year = date.split(' ')[2].strip()
+                date = datetime.datetime.strptime(f'{month} {day} {year} {time}','%b %d %Y %I:%M%p')
 
-    return render_template("messages.html", no_buttons=False, message_title=f"REQUEST DENIED.",
-                           message_subtitle=f"Login First", is_error=True)
+                reserve = Reservations(
+                    customer_username=current_user.username,
+                    reservation_date_and_time=date,
+                    date_reserved=datetime.datetime.now(),
+                    slug=slug
+                )
 
+                db.session.add(reserve)
+                db.session.commit()
+                return redirect(url_for('reservation_success'))
+            except Exception as e:
+                return str(e)
+        else:
+            return render_template("messages.html",no_button=False, message_title=f"REQUEST DENIED.", message_subtitle=f"Login First",is_error=True)
+    return redirect(url_for('reservation_success'))
 
 @app.route('/signup',methods=["POST","GET"])
 def signup():
@@ -346,8 +583,6 @@ def restaurantpage(slug):
                 return render_template("messages.html",no_button=True,message_title=f"COMMENT SUBMITTED!",
                                        message_subtitle="Your comment has been submitted", is_error=False)
 
-
-
             if current_slug != '':
                 if (current_slug != slug):
                     current_slug == slug
@@ -372,10 +607,6 @@ def restaurantpage(slug):
                     db.session.commit()
 
 
-
-
-
-
     restaurant = Restaurants.query.filter_by(slug=slug).one()
     menu_items = MenuItems.query.filter_by(slug=slug).order_by(asc(MenuItems.name))
     comments = Feedback.query.filter_by(slug=slug).order_by(asc(Feedback.username))
@@ -390,6 +621,16 @@ def login_error():
 def login_error_2():
     return render_template("messages.html",no_button=False, message_title=f"CANNOT COMMENT OR RATE!",
                            message_subtitle="You should login first to use this function", is_error=True)
+
+@app.route('/reservation_success')
+def reservation_success():
+    return render_template("messages.html",no_button=True, message_title=f"RESERVATION SUCCESS!",
+                           message_subtitle="Thank you for visiting our Restaurant:)", is_error=False)
+
+@app.route('/reservation_failed')
+def reservation_failed():
+    return render_template("messages.html",no_button=True, message_title=f"RESERVATION FAILED!",
+                           message_subtitle="Something went wrong!)", is_error=True)
 
 
 @app.route('/cart/<string:slug>')
@@ -411,7 +652,6 @@ def cart(slug):
 def empty_cart():
     return render_template("messages.html",no_button=True, message_title=f"CART EMPTY!",
                            message_subtitle=f"Please select a restaurant first and order.", is_error=True)
-
 
 
 @app.route('/order/<string:order_data>',methods=["POST","GET"])
@@ -440,7 +680,6 @@ def order(order_data):
         return render_template("messages.html", no_button=True, message_title=f"ORDER FAILED!",
                                message_subtitle=f"Something went wrong with your request please try again! :)",
                                is_error=False)
-
 
 
 

@@ -21,8 +21,8 @@ class SignupForm(FlaskForm):
     submit = SubmitField('SUBMIT')
 
 class LoginForm(FlaskForm):
-    user_name = StringField('Username',validators=[DataRequired()])
-    password=PasswordField('Password',validators=[DataRequired()])
+    user_name = StringField('Username',render_kw={"placeholder": "Username"},validators=[DataRequired()])
+    password=PasswordField('Password',render_kw={"placeholder": "Password"},validators=[DataRequired()])
 
 class RestaurantSignupForm(FlaskForm):
     restaurant_name = StringField('Restaurant Name', render_kw={"placeholder": "Restaurant Name"},validators=[DataRequired(),Length(min=6, max=32,message="name should be minimum of 6 maximum of 32 characters only.")])
@@ -35,7 +35,7 @@ class RestaurantSignupForm(FlaskForm):
     submit=SubmitField('Submit Registration')
 
 class SearchForm(FlaskForm):
-    search_string= StringField('Search', validators=[DataRequired()])
+    search_string= StringField('Search',render_kw={"placeholder": "Search"}, validators=[DataRequired()])
 
 class CartForm(FlaskForm):
     menu_name = HiddenField()
@@ -49,4 +49,10 @@ class FeedbackForm(FlaskForm):
 
 
 class ReservationForm(FlaskForm):
-    month = SelectField()
+    month = StringField(validators=[DataRequired()])
+    day= StringField(validators=[DataRequired()])
+
+
+class DateRangeForm(FlaskForm):
+    date_from = StringField(validators=[DataRequired()])
+    date_to = StringField(validators=[DataRequired()])

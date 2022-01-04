@@ -42,6 +42,7 @@ class RestaurantsModelView(ModelView):
         if is_created and not model.slug:
             model.slug = str(model.useraccount)
 
+
     def _list_thumbnail(view, context, model, name):
         print(f'name: {name}')
         if name == 'image':
@@ -98,11 +99,13 @@ class ReservationSetupModelView(ModelView):
         time_update_list = []
         time_update_list.append('12:00 AM')
         for i in range(1,12):
-            time_update_list.append(f'{i}:00 AM')
+            i_str = str(i).zfill(2)
+            time_update_list.append(f'{i_str}:00 AM')
 
         time_update_list.append('12:00 PM')
         for i in range(1,12):
-            time_update_list.append(f'{i}:00 PM')
+            i_str = str(i).zfill(2)
+            time_update_list.append(f'{i_str}:00 PM')
 
 
         for i in range(0, len(time_update_list)):
@@ -117,10 +120,12 @@ class ReservationSetupModelView(ModelView):
     except Exception as e:
         print(e)
 
-
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('login'))
         return True
+
+
+
 
 
 
@@ -219,6 +224,28 @@ class DeliveryModelView2(ModelView):
 
     def get_query(self):
         return self.session.query(self.model).filter(self.model.delivered == True).filter(self.model.slug == current_user.name)
+
+    def is_accessible(self):
+        if current_user.is_authenticated :
+            if current_user.access == 'restaurant':
+                return True
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('login'))
+        return True
+
+
+class ReservationModelView(ModelView):
+    can_create=False
+    can_delete=False
+    page_size = 50
+    create_modal = True
+    edit_modal = True
+    column_exclude_list = ['slug', ]
+    # form_excluded_columns=['userid','slug','cartitems''date','total']
+
+    def get_query(self):
+        return self.session.query(self.model).filter(self.model.slug == current_user.name)
 
     def is_accessible(self):
         if current_user.is_authenticated :

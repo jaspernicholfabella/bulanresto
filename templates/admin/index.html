@@ -1,63 +1,290 @@
 {%extends 'admin/master.html' %}
 
 {%block body%}
-<div style="margin-top: 2rem;display:flex; flex-wrap:wrap; align-items: center; justify-content: center;">
 {%if is_admin%}
-<div class="card  bg-primary mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
-  <div class="card-body">
-      <center>
-        <h5 class="card-title text-white">Total Number of Users</h5>
-        <h1 class="card-text text-white">{{total_no[0]}}</h1>
-      </center>
-  </div>
-</div>
-<div class="card text-white bg-warning mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
-  <div class="card-body">
-     <center>
-    <h5 class="card-title text-white">Total Restaurants</h5>
-    <h1 class="card-text text-white">{{total_no[1]}}</h1>
-     </center>
-  </div>
-</div>
-<div class="card text-white bg-info mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
-  <div class="card-body">
-      <center>
-        <h5 class="card-title text-white">Restaurant Requests</h5>
-        <h1 class="card-text text-white">{{total_no[2]}}</h1>
-      </center>
-  </div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary" style="margin">
+				<h5 class="card-header">
+					Total Number of Users
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[0]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="card text-white bg-warning">
+				<h5 class="card-header">
+					Total Restaurants
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[1]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="card text-white bg-danger">
+				<h5 class="card-header">
+					Pending Request
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[2]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {%else%}
-<div class="card  bg-primary mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
-  <div class="card-body">
-      <center>
-        <h5 class="card-title text-white">Delivery Requests</h5>
-        <h1 class="card-text text-white">{{total_no[0]}}</h1>
-      </center>
-  </div>
-</div>
-<div class="card text-white bg-warning mb-3" style="min-width: 15rem;max-width: 15rem; margin-right:1rem; margin-left:1rem;">
-  <div class="card-body">
-     <center>
-    <h5 class="card-title text-white">Total Food Delivery</h5>
-    <h1 class="card-text text-white">{{total_no[1]}}</h1>
-     </center>
-  </div>
-</div>
-<div class="card text-white bg-info mb-3" style="min-width: 15rem;max-width: 20rem; margin-right:1rem; margin-left:1rem;">
-  <div class="card-body">
-      <center>
-        <h5 class="card-title text-white">Top Menu Item</h5>
-        <h1 class="card-text text-white">{{total_no[2]}}</h1>
-      </center>
-  </div>
+
+<div class="container-fluid">
+	<div class="row" style="margin-bottom:1rem;margin-top:1rem;">
+		<div class="col-md-12" >
+			<h2>
+				Dashboard
+			</h2>
+		</div>
+	</div>
+	<div class="row" >
+		<div class="col-md-6" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header" >
+					Top Menu Item This Month
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[0]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+					</center>
+			</div>
+		</div>
+
+		<div class="col-md-6" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					Top Menu Item of All Time
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[1]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-3" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					Delivery Requests
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[2]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-3" style="margin-bottom:1rem;">
+			<div class="card text-white bg-danger">
+				<center>
+				<h5 class="card-header">
+					Food Delivered Today
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[3]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-3" style="margin-bottom:1rem;">
+			<div class="card text-white bg-danger">
+				<center>
+				<h5 class="card-header">
+					Food Delivered this Month
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[4]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-3" style="margin-bottom:1rem;">
+			<div class="card text-white bg-danger">
+				<center>
+				<h5 class="card-header">
+					Total food delivered
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[5]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="margin-bottom:1rem;">
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					Reservations Today
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[6]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="card text-white bg-warning">
+				<center>
+				<h5 class="card-header">
+					Reservations This Month
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[7]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="card text-white bg-warning" >
+				<center>
+				<h5 class="card-header">
+					All Reservations
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{total_no[8]}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+	</div>
+
+	<div class="row" style="margin-bottom:2rem;margin-top:3rem;">
+		<div class="col-md-12"  >
+			<h2>
+				Generate Transaction and Sales Records
+			</h2>
+		</div>
+	</div>
+	<div class="row" style="margin-bottom:5rem;margin-top:1rem;">
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="jumbotron card card-block">
+				<center>
+				<h2>
+					Generate Dalies
+				</h2>
+				<p>
+					View Today's Record.
+				</p>
+				<p>
+					<a class="btn btn-primary btn-large" href="/admin/records/daily">Generate</a>
+				</p>
+					</center>
+			</div>
+		</div>
+		<div class="col-md-4" style="background-color:black; padding:1rem; margin-bottom:1rem;">
+			<center>
+			<h3 class="text-white">
+				Generate Based on Date Range
+			</h3>
+			</center>
+			<form role="form" method ="post" action="">
+				{{form.hidden_tag()}}
+				<div class="form-group">
+					<label for="date_from" class="text-white">
+						Date From
+					</label>
+					<input name="date_from" type="date" class="form-control" id="date_from" />
+				</div>
+				<div class="form-group">
+
+					<label for="date_to" class="text-white">
+						Date To
+					</label>
+					<input name='date_to' type="date" class="form-control" id="date_to" />
+				</div>
+				<center>
+				<button type="submit" class="btn btn-danger">
+					Generate
+				</button>
+				</center>
+			</form>
+		</div>
+		<div class="col-md-4" style="margin-bottom:1rem;">
+			<div class="jumbotron card card-block">
+				<center>
+				<h2>
+					Generate All Records
+				</h2>
+				<p>
+					View all records in the db.
+				</p>
+				<p>
+					<a class="btn btn-primary btn-large" href="/admin/records/all">Generate</a>
+				</p>
+				</center>
+			</div>
+		</div>
+	</div>
+
 </div>
 {%endif%}
 
-</div>
-
-
-</div>
 
 
 {%endblock%}

@@ -80,12 +80,17 @@ class ReservationSetup(db.Model):
     option_update = Column(String)
     business_hours_start= Column(String)
     business_hours_end= Column(String)
+    gap_in_minutes = Column(Integer,default=60)
     skip_weekends = Column(Boolean,default=False)
     slug=Column(String)
-    table_slots = Column(Integer)
+    table_slots = Column(Integer,default=1)
 
 class Reservations(db.Model):
     __tablename__ = 'reservations'
     id = Column(Integer,primary_key=True)
+    customer_username = Column(String)
+    reservation_date_and_time = Column(DateTime)
+    date_reserved = Column(DateTime)
+    slug = Column(String)
 
 

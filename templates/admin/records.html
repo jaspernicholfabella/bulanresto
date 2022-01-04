@@ -1,0 +1,173 @@
+{%extends 'admin/master.html' %}
+
+{%block body%}
+<div class="container-fluid" id="printableArea">
+	<div class="row" style="margin-bottom:1rem;margin-top:1rem;">
+		<div class="col-md-12" >
+			<h2>
+				Generated {{type|title}} Record
+			</h2>
+			<h5 style="margin-top:.5rem">
+				for {{date_range}}
+			</h5>
+		</div>
+	</div>
+
+	<div class="row" style="margin-bottom:1rem;">
+		<div class="col-md-6" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					Top Menu Item
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{top_menu_item}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-6" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					No. Product Sold
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{no_product}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="row" style="margin-bottom:3rem;">
+		<div class="col-md-6" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					Food Delivered
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{food_delivery}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+		<div class="col-md-6" style="margin-bottom:1rem;">
+			<div class="card text-white bg-primary">
+				<center>
+				<h5 class="card-header">
+					Reservations
+				</h5>
+				<div class="card-body">
+					<h1 class="card-text text-white">
+						{{reservations}}
+					</h1>
+				</div>
+				<div class="card-footer">
+				</div>
+				</center>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="margin-bottom:1rem;margin-top:1rem;">
+		<div class="col-md-12" >
+			<h2>
+				{{type|title}} Sales Record
+			</h2>
+		</div>
+	</div>
+	<div class="row" >
+		<div class="col-md-12">
+			<table class="table" style="margin-bottom:3rem;">
+				<thead>
+					<tr>
+						<th>
+							UserID
+						</th>
+						<th>
+							Ordered Product
+						</th>
+						<th>
+							Address
+						</th>
+						<th>
+							Date
+						</th>
+						<th>
+							Sales
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%for record in delivery_record %}
+					<tr>
+						<td>{{record.userid}}</td>
+						<td>{{record.cartitems|replace("__", " x ")|replace("::",", ")}}</td>
+						<td>{{record.address}}</td>
+						<td>{{record.date.strftime('%b %d, %Y')}}</td>
+						<td>{{'%0.2f' % record.total}}</td>
+					</tr>
+				{%endfor%}
+
+				</tbody>
+			</table>
+			<div class="row" style="margin-bottom:5rem;">
+				<div class="col-md-6">
+				</div>
+				<div class="col-md-6">
+					<div class="row">
+						<div class="col-md-6">
+							<h5>
+								Total Sales :
+							</h5>
+						</div>
+						<div class="col-md-6">
+							<h5>
+								{{'%0.2f' % total_sales}} PHP
+							</h5>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<div class="row" style="margin-bottom:3rem;">
+	<div class="col-md-12">
+		<center>
+		<button type="button" onclick="printDiv('printableArea')" value="print a div!" class="btn btn-primary btn-large">
+			Print
+		</button>
+		</center>
+	</div>
+</div>
+
+<script>
+	function printDiv(divName) {
+     var printContents = document.getElementById(divName).innerHTML;
+     var originalContents = document.body.innerHTML;
+
+     document.body.innerHTML = printContents;
+
+     window.print();
+
+     document.body.innerHTML = originalContents;
+}
+</script>
+{%endblock%}
